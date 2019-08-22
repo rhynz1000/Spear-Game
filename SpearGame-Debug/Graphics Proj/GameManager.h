@@ -20,7 +20,7 @@ public:
 
 private:
 	CInput* GameInput;
-	CPlayer player;
+	CPlayer player, player2;
 	CCamera camera;
 
 	float spdMultiplier = 1;

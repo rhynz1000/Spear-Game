@@ -1,6 +1,6 @@
 #include "Player.h"
 
-void CPlayer::initalise(CInput * input, CCamera* newCamera, float sizeH, float sizeW, float initalX, float initalY, GLuint prog, GLuint tex)
+void CPlayer::initalise(CInput * input, CCamera* newCamera, float sizeH, float sizeW, float initalX, float initalY, GLuint prog, GLuint tex, int joy)
 {
 	CQuad::Initalise(newCamera, sizeH, sizeW, initalX, initalY, prog, tex);
 
@@ -8,17 +8,28 @@ void CPlayer::initalise(CInput * input, CCamera* newCamera, float sizeH, float s
 	spearTex = tex;
 	gameInput = input;
 	camera = newCamera;
+	joystick = joy;
 }
 
 void CPlayer::update(float deltaTime)
 {
-
 	bool up, down, left, right, shoot;
 	shoot = gameInput->checkKeyDownFirst(KEY, GLFW_KEY_E);
 	up = gameInput->checkKeyDownFirst(KEY, GLFW_KEY_SPACE);
 	left = gameInput->checkKeyDown(KEY, GLFW_KEY_A);
 	right = gameInput->checkKeyDown(KEY, GLFW_KEY_D);
 	float horizontalSpeed = (left && !right) || (right && !left) ? (right ? 1.0f : -1.0f) : 0.0f;
+	glm::vec2 spearDir = glm::vec2(0.5f, 0.5f);
+
+	if (gameInput->isJoystickValid(joystick))
+	{
+		GLFWgamepadstate gpState = gameInput->getJoystickInput(joystick);
+		shoot = gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > -1;
+		up = gpState.buttons[GLFW_GAMEPAD_BUTTON_A];
+		horizontalSpeed = gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
+		horizontalSpeed = (abs(horizontalSpeed) > 0.2f) ? horizontalSpeed : 0.0f;
+		spearDir = glm::normalize(glm::vec2(gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_X], -gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]));
+	}
 
 	if (horizontalSpeed != 0.0f) {
 		velocity = glm::vec2(velocity.x + horizontalSpeed * deltaTime * speed * (grounded ? 5.0f : 1.0f), velocity.y);
@@ -77,7 +88,7 @@ void CPlayer::update(float deltaTime)
 
 	if (shoot && spear == 0)
 	{
-		spear = new CSpear(glm::vec2(600,400) + velocity);
+		spear = new CSpear(spearDir*spearSpd + velocity);
 		spear->Initalise(camera, 10,50, getPos().x, getPos().y, spearProg, spearTex);
 	}
 

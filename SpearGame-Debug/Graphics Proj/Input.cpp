@@ -210,3 +210,11 @@ glm::vec2 CInput::getMousePos()//returns the mouse position in the window
 {
 	return glm::vec2(mousex, mousey);
 }
+
+GLFWgamepadstate CInput::getJoystickInput(int joystick)
+{
+	GLFWgamepadstate state;
+	glfwGetGamepadState(joystick, &state);
+	return state;
+}
+
