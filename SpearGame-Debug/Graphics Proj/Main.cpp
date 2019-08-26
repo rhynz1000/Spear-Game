@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	window = glfwCreateWindow(Utils::SCR_WIDTH, Utils::SCR_HEIGHT, "Simple example", glfwGetPrimaryMonitor(), NULL);
+	window = glfwCreateWindow(Utils::SCR_WIDTH, Utils::SCR_HEIGHT, "Simple example", /*glfwGetPrimaryMonitor()*/NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();

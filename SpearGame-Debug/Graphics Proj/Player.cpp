@@ -1,14 +1,16 @@
 #include "Player.h"
 
-void CPlayer::initalise(CInput * input, CCamera* newCamera, float sizeH, float sizeW, float initalX, float initalY, GLuint prog, GLuint tex, int joy)
+void CPlayer::initalise(CInput * input, CCamera* newCamera, float sizeH, float sizeW, float initalX, float initalY, GLuint prog, GLuint playerTex, int joy, GLuint initSpearTex)
 {
-	CQuad::Initalise(newCamera, sizeH, sizeW, initalX, initalY, prog, tex);
+	CQuad::Initalise(newCamera, sizeH, sizeW, initalX, initalY, prog, playerTex);
 
 	spearProg = prog;
-	spearTex = tex;
+	spearTex = initSpearTex;
 	gameInput = input;
 	camera = newCamera;
 	joystick = joy;
+
+	collider.initalise(-0.5, 0.5, 0.5, -0.5, this->getRefToModel());
 }
 
 void CPlayer::update(float deltaTime)
@@ -20,6 +22,9 @@ void CPlayer::update(float deltaTime)
 	right = gameInput->checkKeyDown(KEY, GLFW_KEY_D);
 	float horizontalSpeed = (left && !right) || (right && !left) ? (right ? 1.0f : -1.0f) : 0.0f;
 	glm::vec2 spearDir = glm::vec2(0.5f, 0.5f);
+	
+	float halfScrWidth = ((float)Utils::SCR_WIDTH) / 2;
+	float halfScrHeight = ((float)Utils::SCR_HEIGHT) / 2;
 
 	if (gameInput->isJoystickValid(joystick))
 	{
@@ -94,8 +99,16 @@ void CPlayer::update(float deltaTime)
 
 	if (spear != 0)
 	{
+		glm::vec2 tipPos = glm::vec2(spear->getScale().x / 2, 0);
+		tipPos = glm::vec2(spear->getRotationMat() * glm::vec4(tipPos, 0.0f, 1.0f));
+		tipPos += spear->getPos();
+
+		if (tipPos.y < -0.5f * static_cast<float>(Utils::SCR_HEIGHT) || tipPos.x < -0.5f * static_cast<float>(Utils::SCR_WIDTH) || tipPos.x > 0.5f * static_cast<float>(Utils::SCR_WIDTH))
+		{
+			spear->setInWall(true);
+		}
 		spear->update(deltaTime);
-		if (spear->getPos().y < -0.5f * static_cast<float>(Utils::SCR_HEIGHT))
+		if (collider.collide(spear->getCollider()) && spear->isInWall())
 		{
 			delete spear;
 			spear = 0;

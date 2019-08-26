@@ -113,7 +113,8 @@ void C2DShape::scale(AXIS axis, float amount)
 
 glm::mat4 C2DShape::getModel()
 {
-	return (translationMatrix * rotationMatrixX * rotationMatrixY * rotationMatrixZ * scaleMatrix);//calculates and returns model matrix
+	model = translationMatrix * rotationMatrixZ * scaleMatrix;
+	return model;//calculates and returns model matrix
 }
 
 void C2DShape::render(glm::mat4 anchor)
@@ -139,43 +140,4 @@ void C2DShape::render(glm::mat4 anchor)
 
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, IndiceCount, GL_UNSIGNED_INT, 0);
-}
-
-bool C2DShape::collision(C2DShape * other)
-{
-	glm::vec2 pos = getPos();
-	glm::vec2 scale = getScale();
-
-	glm::vec2 posOther = other->getPos();
-	glm::vec2 scaleOther = other->getScale();
-
-	if ((pos.x + (scale.x *0.5)/*right*/ > posOther.x - (scaleOther.x *0.5)/*left*/ && pos.x - (scale.x *0.5)/*left*/ < posOther.x + (scaleOther.x *0.5)/*right*/) &&
-		(pos.y + (scale.y *0.5)/*top*/ > posOther.y - (scaleOther.y *0.5)/*bottom*/ && pos.y - (scale.y *0.5)/*bottom*/ < posOther.y + (scaleOther.y *0.5)/*top*/))
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool C2DShape::collision(std::vector<C2DShape*> other)
-{
-	glm::vec2 pos = getPos();
-	glm::vec2 scale = getScale();
-
-	glm::vec2 posOther;
-	glm::vec2 scaleOther;
-	
-	for (auto it = other.begin(); it != other.end(); it++)
-	{
-		posOther = (*it)->getPos();
-		scaleOther = (*it)->getScale();
-		if ((pos.x + (scale.x *0.5)/*right*/ > posOther.x - (scaleOther.x *0.5)/*left*/ && pos.x - (scale.x *0.5)/*left*/ < posOther.x + (scaleOther.x *0.5)/*right*/) &&
-			(pos.y + (scale.y *0.5)/*top*/ > posOther.y - (scaleOther.y *0.5)/*bottom*/ && pos.y - (scale.y *0.5)/*bottom*/ < posOther.y + (scaleOther.y *0.5)/*top*/))
-		{
-			return true;
-		}
-	}
-
-	return false;
 }
