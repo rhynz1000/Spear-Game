@@ -13,7 +13,7 @@ void CPlayer::initalise(CInput * input, CCamera* newCamera, float sizeH, float s
 	collider.initalise(-0.5, 0.5, 0.5, -0.5, this->getRefToModel());
 }
 
-void CPlayer::update(float deltaTime, std::vector<CTile> & level)
+void CPlayer::update(float deltaTime, std::vector<CTile*> & level)
 {
 	bool up, down, left, right, shoot, punch;
 
@@ -97,11 +97,12 @@ void CPlayer::update(float deltaTime, std::vector<CTile> & level)
 			bool breaking = false;
 			translate(X, step.x, true);
 			translate(Y, step.y, true);
-			for (CTile tile : level) {
-				if (tile.GetCollider().collide(collider)) {
+			for (CTile *tile : level) {
+				if (tile->GetCollider().collide(collider)) {
 					translate(X, -step.x, true);
 					translate(Y, -step.y, true);
 					breaking = true;
+					grounded = true;
 					break;
 				}
 			}

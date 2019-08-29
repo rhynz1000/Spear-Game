@@ -9,6 +9,9 @@ CLevel::CLevel()
 
 CLevel::~CLevel()
 {
+	for (CTile *tile : tileArray) {
+		delete tile;
+	}
 }
 
 void CLevel::LoadFromCSV(std::string filePath, CCamera * camera, GLuint prog)
@@ -25,8 +28,8 @@ void CLevel::LoadFromCSV(std::string filePath, CCamera * camera, GLuint prog)
 		for (char item : line) {
 			if (item == ',') continue;
 			if (item == '1') {
-				CTile temp = CTile();
-				temp.Initalise(camera, size, size, x * size + size / 2.0f - Utils::SCR_WIDTH / 2.0f, y * size + size / 2.0f - Utils::SCR_HEIGHT / 2.0f, prog, tex);
+				CTile* temp = new CTile();
+				temp->Initalise(camera, size, size, x * size + size / 2.0f - Utils::SCR_WIDTH / 2.0f, y * size + size / 2.0f - Utils::SCR_HEIGHT / 2.0f, prog, tex);
 				tileArray.push_back(temp);
 			}
 			x++;
@@ -39,12 +42,12 @@ void CLevel::LoadFromCSV(std::string filePath, CCamera * camera, GLuint prog)
 
 void CLevel::Render()
 {
-	for (CTile tile : tileArray) {
-		tile.render(glm::mat4());
+	for (CTile *tile : tileArray) {
+		tile->render(glm::mat4());
 	}
 }
 
-std::vector<CTile>& CLevel::GetTiles()
+std::vector<CTile*>& CLevel::GetTiles()
 {
 	return tileArray;
 }
