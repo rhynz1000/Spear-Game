@@ -15,7 +15,8 @@ void CGameManager::initalise(CInput* input)
 
 	camera.orthoInti(Utils::SCR_WIDTH, Utils::SCR_HEIGHT, 0.1f, 100.0f);
 
-	player.initalise(GameInput, &camera, 100, 100, 0, 0, program, texture1);
+	player.initalise(GameInput, &camera, 100, 100, 0, 0, program, texture1, 0, texture);
+	//player2.initalise(GameInput, &camera, 100, 100, 0, 0, program, texture, 1, texture1);
 }
 
 void CGameManager::update()
@@ -24,11 +25,14 @@ void CGameManager::update()
 	previousTime = std::chrono::high_resolution_clock::now();
 
 	float DT = deltaTime.count() > 1.0f ? 1.0f : deltaTime.count();
+	DT *= spdMultiplier;
 	
 	player.update(DT);
+	//player2.update(DT);
 }
 
 void CGameManager::render()
 {
 	player.render();
+	//player2.render();
 }

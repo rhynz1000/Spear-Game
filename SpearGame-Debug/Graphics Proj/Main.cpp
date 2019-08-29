@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
+	window = glfwCreateWindow(Utils::SCR_WIDTH, Utils::SCR_HEIGHT, "Simple example", /*glfwGetPrimaryMonitor()*/NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -81,6 +81,7 @@ int main(int argc, char **argv)
 		glfwPollEvents();
 	}
 
+	
 	glfwDestroyWindow(window);
 	glfwTerminate();
 	exit(EXIT_SUCCESS);
@@ -105,15 +106,6 @@ void Render()
 //glut update function
 void Update()
 {
-	/*int count;
-	const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_2, &count);
-
-	for (int i = 0; i < count; i++)
-	{
-		std::cout << axes[i] << " ,";
-	}
-	std::cout << std::endl;*/
-
 	if (GameInput.checkKeyDownFirst(KEY, GLFW_KEY_KP_ADD))
 	{
 		gameManager.spdup();
