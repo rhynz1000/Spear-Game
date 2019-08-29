@@ -13,9 +13,11 @@ void CPlayer::initalise(CInput * input, CCamera* newCamera, float sizeH, float s
 	collider.initalise(-0.5, 0.5, 0.5, -0.5, this->getRefToModel());
 }
 
-void CPlayer::update(float deltaTime)
+void CPlayer::update(float deltaTime, std::vector<CTile> & level)
 {
-	bool up, down, left, right, shoot;
+	bool up, down, left, right, shoot, punch;
+
+	punch = gameInput->checkKeyDownFirst(KEY, GLFW_KEY_Q);
 	shoot = gameInput->checkKeyDownFirst(KEY, GLFW_KEY_E);
 	up = gameInput->checkKeyDownFirst(KEY, GLFW_KEY_SPACE);
 	left = gameInput->checkKeyDown(KEY, GLFW_KEY_A);
@@ -29,6 +31,7 @@ void CPlayer::update(float deltaTime)
 	if (gameInput->isJoystickValid(joystick))
 	{
 		GLFWgamepadstate gpState = gameInput->getJoystickInput(joystick);
+		punch = gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > -1;
 		shoot = gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > -1;
 		up = gpState.buttons[GLFW_GAMEPAD_BUTTON_A];
 		horizontalSpeed = gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
@@ -67,6 +70,10 @@ void CPlayer::update(float deltaTime)
 		translate(Y, -static_cast<float>(Utils::SCR_HEIGHT), true);
 	}
 
+	while (getPos().y < -0.5f * static_cast<float>(Utils::SCR_HEIGHT)) {
+		translate(Y, static_cast<float>(Utils::SCR_HEIGHT), true);
+	}
+
 	float hFriction = grounded ? 4.0f : 0.1f;
 	float vFriction = 1.0f;
 
@@ -78,16 +85,28 @@ void CPlayer::update(float deltaTime)
 
 	if (velocity != glm::vec2(0.0f, 0.0f))
 	{
-		translate(X, velocity.x * deltaTime, true);
-		if (getPos().y + velocity.y * deltaTime < -0.5f * static_cast<float>(Utils::SCR_HEIGHT)) {
-			translate(Y, -0.5f * static_cast<float>(Utils::SCR_HEIGHT), false);
-			velocity.y = 0.0f;
-			grounded = true;
-			canDoubleJump = true;
+
+		float moveMax = velocity.length() * deltaTime;
+		float moveCount = 0.0f;
+		glm::vec2 step = velocity * deltaTime;
+		if (moveMax > 1.0f) {
+			step = glm::normalize(velocity);
 		}
-		else {
-			translate(Y, velocity.y * deltaTime, true);
-			grounded = false;
+
+		while (moveCount < moveMax) {
+			bool breaking = false;
+			translate(X, step.x, true);
+			translate(Y, step.y, true);
+			for (CTile tile : level) {
+				if (tile.GetCollider().collide(collider)) {
+					translate(X, -step.x, true);
+					translate(Y, -step.y, true);
+					breaking = true;
+					break;
+				}
+			}
+			if (breaking) break;
+			moveCount += fmin(moveMax + 0.01f, 1.0f);
 		}
 	}
 
@@ -108,7 +127,7 @@ void CPlayer::update(float deltaTime)
 			spear->setInWall(true);
 		}
 		spear->update(deltaTime);
-		if (collider.collide(spear->getCollider()) && spear->isInWall())
+		if (collider.collide(spear->getCollider()) && spear->isInWall() && punch)
 		{
 			delete spear;
 			spear = 0;

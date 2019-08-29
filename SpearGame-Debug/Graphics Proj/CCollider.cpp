@@ -25,13 +25,14 @@ bool C2DCollider::collide(C2DCollider other)
 	bottomLeftOther = glm::vec2((*other.model) * glm::vec4(other.left, other.bottom, 0.0f, 1.0f));
 	bottomRightOther = glm::vec2((*other.model) * glm::vec4(other.right, other.bottom, 0.0f, 1.0f));
 
+	//Lines / axis
+
+	Line A(topLeft, topRight), B(topLeft, bottomLeft), AOther(topLeftOther, bottomRightOther), BOther(topLeftOther, bottomLeftOther);
+
 	//first axis
-	glm::vec2 lineA, lineB;
-	lineA = topLeft;
-	lineB = topRight;
 
 	float max = 1, min = 0;
-	float maxOther, minOther = pointToLine(topLeftOther, lineA, lineB);
+	float maxOther, minOther = pointToLine(topLeftOther, A.pt1, A.pt2);
 	maxOther = minOther;
 
 	float current;//= pointToLine(bottomLeft, lineA, lineB);
@@ -44,17 +45,17 @@ bool C2DCollider::collide(C2DCollider other)
 	//max = (current > max) ? current : max;
 	//min = (current < min) ? current : min;
 
-	current = pointToLine(topRightOther, lineA, lineB);
+	current = pointToLine(topRightOther, A.pt1, A.pt2);
 
 	maxOther = (current > maxOther) ? current : maxOther;
 	minOther = (current < minOther) ? current : minOther;
 
-	current = pointToLine(bottomLeftOther, lineA, lineB);
+	current = pointToLine(bottomLeftOther, A.pt1, A.pt2);
 
 	maxOther = (current > maxOther) ? current : maxOther;
 	minOther = (current < minOther) ? current : minOther;
 
-	current = pointToLine(bottomRightOther, lineA, lineB);
+	current = pointToLine(bottomRightOther, A.pt1, A.pt2);
 
 	maxOther = (current > maxOther) ? current : maxOther;
 	minOther = (current < minOther) ? current : minOther;
@@ -66,11 +67,8 @@ bool C2DCollider::collide(C2DCollider other)
 
 	//second axis
 
-	lineA = topLeft;
-	lineB = bottomLeft;
-
 	max = 1, min = 0;
-	minOther = pointToLine(topLeftOther, lineA, lineB);
+	minOther = pointToLine(topLeftOther, B.pt1, B.pt2);
 	maxOther = minOther;
 
 	//current = pointToLine(topRight, lineA, lineB);
@@ -83,17 +81,17 @@ bool C2DCollider::collide(C2DCollider other)
 	//max = (current > max) ? current : max;
 	//min = (current < min) ? current : min;
 
-	current = pointToLine(topRightOther, lineA, lineB);
+	current = pointToLine(topRightOther, B.pt1, B.pt2);
 
 	maxOther = (current > maxOther) ? current : maxOther;
 	minOther = (current < minOther) ? current : minOther;
 
-	current = pointToLine(bottomLeftOther, lineA, lineB);
+	current = pointToLine(bottomLeftOther, B.pt1, B.pt2);
 
 	maxOther = (current > maxOther) ? current : maxOther;
 	minOther = (current < minOther) ? current : minOther;
 
-	current = pointToLine(bottomRightOther, lineA, lineB);
+	current = pointToLine(bottomRightOther, B.pt1, B.pt2);
 
 	maxOther = (current > maxOther) ? current : maxOther;
 	minOther = (current < minOther) ? current : minOther;
@@ -103,13 +101,16 @@ bool C2DCollider::collide(C2DCollider other)
 		return false;
 	}
 
+	if (A.dir() == AOther.dir() || A.dir() == BOther.dir() || -A.dir() == AOther.dir() || -A.dir() == BOther.dir())
+	{
+		return true;
+	}
+
+
 	//third axis
 
-	lineA = topLeftOther;
-	lineB = topRightOther;
-
 	max = 1, min = 0;
-	minOther = pointToLine(topLeft, lineA, lineB);
+	minOther = pointToLine(topLeft, AOther.pt1, AOther.pt2);
 	maxOther = minOther;
 
 	//current = pointToLine(bottomLeftOther, lineA, lineB);
@@ -122,17 +123,17 @@ bool C2DCollider::collide(C2DCollider other)
 	//max = (current > max) ? current : max;
 	//min = (current < min) ? current : min;
 
-	current = pointToLine(topRight, lineA, lineB);
+	current = pointToLine(topRight, AOther.pt1, AOther.pt2);
 
 	maxOther = (current > maxOther) ? current : maxOther;
 	minOther = (current < minOther) ? current : minOther;
 
-	current = pointToLine(bottomLeft, lineA, lineB);
+	current = pointToLine(bottomLeft, AOther.pt1, AOther.pt2);
 
 	maxOther = (current > maxOther) ? current : maxOther;
 	minOther = (current < minOther) ? current : minOther;
 
-	current = pointToLine(bottomRight, lineA, lineB);
+	current = pointToLine(bottomRight, AOther.pt1, AOther.pt2);
 
 	maxOther = (current > maxOther) ? current : maxOther;
 	minOther = (current < minOther) ? current : minOther;
@@ -144,11 +145,8 @@ bool C2DCollider::collide(C2DCollider other)
 
 	//forth axis
 
-	lineA = topLeftOther;
-	lineB = bottomLeftOther;
-
 	max = 1, min = 0;
-	minOther = pointToLine(topLeft, lineA, lineB);
+	minOther = pointToLine(topLeft, BOther.pt1, BOther.pt2);
 	maxOther = minOther;
 
 	//current = pointToLine(topRightOther, lineA, lineB);
@@ -161,17 +159,17 @@ bool C2DCollider::collide(C2DCollider other)
 	//max = (current > max) ? current : max;
 	//min = (current < min) ? current : min;
 
-	current = pointToLine(topRight, lineA, lineB);
+	current = pointToLine(topRight, BOther.pt1, BOther.pt2);
 
 	maxOther = (current > maxOther) ? current : maxOther;
 	minOther = (current < minOther) ? current : minOther;
 
-	current = pointToLine(bottomLeft, lineA, lineB);
+	current = pointToLine(bottomLeft, BOther.pt1, BOther.pt2);
 
 	maxOther = (current > maxOther) ? current : maxOther;
 	minOther = (current < minOther) ? current : minOther;
 
-	current = pointToLine(bottomRight, lineA, lineB);
+	current = pointToLine(bottomRight, BOther.pt1, BOther.pt2);
 
 	maxOther = (current > maxOther) ? current : maxOther;
 	minOther = (current < minOther) ? current : minOther;

@@ -15,5 +15,13 @@ public:
 
 private:
 	float pointToLine(glm::vec2 point, glm::vec2 lineA, glm::vec2 lineB);
+
+	struct Line
+	{
+		Line(glm::vec2 A, glm::vec2 B):pt1(A), pt2(B){}
+		glm::vec2 pt1;
+		glm::vec2 pt2;
+		glm::vec2 dir() { return glm::normalize(pt1 - pt2); }
+	};
 };
 
