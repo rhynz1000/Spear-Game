@@ -15,7 +15,9 @@ void CGameManager::initalise(CInput* input)
 
 	camera.orthoInti(Utils::SCR_WIDTH, Utils::SCR_HEIGHT, 0.1f, 100.0f);
 
-	player.initalise(GameInput, &camera, 100, 100, 0, 0, program, texture1, 0, texture);
+	level1.LoadFromCSV("Resources/Levels/SpearGameLevel1.csv", &camera, program);
+
+	player.initalise(GameInput, &camera, 100, 100, 0, 300, program, texture1, 0, texture);
 	//player2.initalise(GameInput, &camera, 100, 100, 0, 0, program, texture, 1, texture1);
 }
 
@@ -24,15 +26,16 @@ void CGameManager::update()
 	deltaTime = std::chrono::high_resolution_clock::now() - previousTime;
 	previousTime = std::chrono::high_resolution_clock::now();
 
-	float DT = deltaTime.count() > 1.0f ? 1.0f : deltaTime.count();
+	float DT = deltaTime.count() > 0.1f ? 0.1f : deltaTime.count();
 	DT *= spdMultiplier;
 	
-	player.update(DT);
+	player.update(DT, level1.GetTiles());
 	//player2.update(DT);
 }
 
 void CGameManager::render()
 {
+	level1.Render();
 	player.render();
 	//player2.render();
 }

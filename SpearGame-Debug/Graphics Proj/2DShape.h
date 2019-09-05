@@ -29,7 +29,7 @@ public:
 	void translate(AXIS axis, float amount, bool relative);//sets translation matrices
 	void scale(AXIS axis, float amount);//sets scale matrices
 	glm::mat4 getModel();//calculates model matrix and returns it
-	glm::mat4 *getRefToModel() { return &model; }
+	glm::mat4 *getRefToModel() { getModel(); return &model; }
 	glm::vec2 getPos() { return glm::vec2(objPosition); }
 	glm::vec2 getScale() { return glm::vec2(objScale); }
 	glm::mat4 getRotationMat() { return rotationMatrixZ; }
