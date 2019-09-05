@@ -4,5 +4,5 @@ void CTile::Initalise(CCamera * newCamera, float sizeH, float sizeW, float inita
 {
 	CQuad::Initalise(newCamera, sizeH, sizeW, initalX, initalY, prog, tex);
 
-	boxCollider.initalise(-0.5, 0.5, 0.5, -0.5, getRefToModel());
+	boxCollider.initalise(-0.5, 0.5, 0.5, -0.5f, this);
 }

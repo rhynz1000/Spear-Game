@@ -26,7 +26,7 @@ void CGameManager::update()
 	deltaTime = std::chrono::high_resolution_clock::now() - previousTime;
 	previousTime = std::chrono::high_resolution_clock::now();
 
-	float DT = deltaTime.count() > 1.0f ? 1.0f : deltaTime.count();
+	float DT = deltaTime.count() > 0.1f ? 0.1f : deltaTime.count();
 	DT *= spdMultiplier;
 	
 	player.update(DT, level1.GetTiles());

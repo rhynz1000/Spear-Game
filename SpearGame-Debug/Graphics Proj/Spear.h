@@ -7,7 +7,7 @@ class CSpear :
 	public CQuad
 {
 public:
-	CSpear(glm::vec2 initVel) :velocity(initVel) { collider.initalise(-0.5, 0.5, 0.5, -0.5, this->getRefToModel()); }
+	CSpear(glm::vec2 initVel) :velocity(initVel) { collider.initalise(-0.5, 0.5, 0.5, -0.5, this); }
 	~CSpear() {}
 
 	void update(float deltaTime);

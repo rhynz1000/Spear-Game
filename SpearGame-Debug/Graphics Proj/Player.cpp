@@ -10,7 +10,7 @@ void CPlayer::initalise(CInput * input, CCamera* newCamera, float sizeH, float s
 	camera = newCamera;
 	joystick = joy;
 
-	collider.initalise(-0.5, 0.5, 0.5, -0.5, this->getRefToModel());
+	collider.initalise(-0.5, 0.5, 0.5, -0.5, this);
 }
 
 void CPlayer::update(float deltaTime, std::vector<CTile*> & level)
@@ -49,15 +49,21 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level)
 		}
 	}
 
+	if (up && !grounded)
+	{
+		std::cout << "jump no ground: " << velocity.x << ", "<< velocity.y << std::endl;
+	}
+
 	if (up && grounded ) {
-		velocity.y += 800.0f;
+		velocity.y = 800.0f;
+		canDoubleJump = true;
 	}
 	else if(up && canDoubleJump && velocity.y < 400.0f) {
 		velocity.y = 800.0f;
 		canDoubleJump = false;
 	}
 
-	velocity = velocity + glm::vec2(0.0f, -1500.0f * deltaTime);
+	if (!grounded) { velocity = velocity + glm::vec2(0.0f, -1500.0f * deltaTime); }
 
 	while (getPos().x < -0.5f * static_cast<float>(Utils::SCR_WIDTH)) {
 		translate(X, static_cast<float>(Utils::SCR_WIDTH), true);
@@ -85,6 +91,20 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level)
 
 	if (velocity != glm::vec2(0.0f, 0.0f))
 	{
+		bool coll = false;
+		grounded = false;
+
+		translate(X, velocity.x * deltaTime, true);
+		translate(Y, velocity.y * deltaTime, true);
+
+		for (CTile *tile : level) {
+			if (collider.collide(tile->GetCollider())) {
+				translate(X, -velocity.x * deltaTime, true);
+				translate(Y, -velocity.y * deltaTime, true);
+				coll = true;
+				break;
+			}
+		}
 
 		float moveMax = velocity.length() * deltaTime;
 		float moveCount = 0.0f;
@@ -93,22 +113,45 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level)
 			step = glm::normalize(velocity);
 		}
 
-		while (moveCount < moveMax) {
+
+		while (moveCount < moveMax && coll) {
 			bool breaking = false;
-			translate(X, step.x, true);
 			translate(Y, step.y, true);
+
 			for (CTile *tile : level) {
-				if (tile->GetCollider().collide(collider)) {
-					translate(X, -step.x, true);
+				if (collider.collide(tile->GetCollider())) {
 					translate(Y, -step.y, true);
 					breaking = true;
-					grounded = true;
-					break;
+					if (velocity.y > 0.0f) {
+						velocity.y = 0.0f;
+					}
+					else if (velocity.y <= 0.0f) {
+						velocity.y = 0.0f;
+						grounded = true;
+					}
 				}
 			}
 			if (breaking) break;
 			moveCount += fmin(moveMax + 0.01f, 1.0f);
 		}
+
+		moveCount = 0;
+
+		while (moveCount < moveMax && coll) {
+			bool breaking = false;
+			translate(X, step.x, true);
+
+			for (CTile *tile : level) {
+				if (collider.collide(tile->GetCollider())) {
+					translate(X, -step.x, true);
+					breaking = true;
+					velocity.x = 0.0f;
+				}
+			}
+			if (breaking) break;
+			moveCount += fmin(moveMax + 0.01f, 1.0f);
+		}	
+		
 	}
 
 	if (shoot && spear == 0)
