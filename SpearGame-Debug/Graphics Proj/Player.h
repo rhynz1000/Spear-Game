@@ -5,6 +5,7 @@
 #include "Quad.h"
 #include "Spear.h"
 #include "CCollider.h"
+#include "CTile.h"
 
 class CPlayer : public CQuad
 {
@@ -13,7 +14,7 @@ public:
 	~CPlayer() {}
 
 	void initalise(CInput* input, CCamera* newCamera, float sizeH, float sizeW, float initalX, float initalY, GLuint prog, GLuint playerTex, int joy, GLuint initSpearTex);
-	void update(float deltaTime);
+	void update(float deltaTime, std::vector<CTile*> & level);
 	void render();
 	C2DCollider getCollider() { return collider; }
 

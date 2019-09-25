@@ -10,12 +10,14 @@ void CPlayer::initalise(CInput * input, CCamera* newCamera, float sizeH, float s
 	camera = newCamera;
 	joystick = joy;
 
-	collider.initalise(-0.5, 0.5, 0.5, -0.5, this->getRefToModel());
+	collider.initalise(-0.5, 0.5, 0.5, -0.5, this);
 }
 
-void CPlayer::update(float deltaTime)
+void CPlayer::update(float deltaTime, std::vector<CTile*> & level)
 {
-	bool up, down, left, right, shoot;
+	bool up, down, left, right, shoot, punch;
+
+	punch = gameInput->checkKeyDownFirst(KEY, GLFW_KEY_Q);
 	shoot = gameInput->checkKeyDownFirst(KEY, GLFW_KEY_E);
 	up = gameInput->checkKeyDownFirst(KEY, GLFW_KEY_SPACE);
 	left = gameInput->checkKeyDown(KEY, GLFW_KEY_A);
@@ -29,6 +31,7 @@ void CPlayer::update(float deltaTime)
 	if (gameInput->isJoystickValid(joystick))
 	{
 		GLFWgamepadstate gpState = gameInput->getJoystickInput(joystick);
+		punch = gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > -1;
 		shoot = gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > -1;
 		up = gpState.buttons[GLFW_GAMEPAD_BUTTON_A];
 		horizontalSpeed = gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
@@ -46,15 +49,21 @@ void CPlayer::update(float deltaTime)
 		}
 	}
 
+	if (up && !grounded)
+	{
+		std::cout << "jump no ground: " << velocity.x << ", "<< velocity.y << std::endl;
+	}
+
 	if (up && grounded ) {
-		velocity.y += 800.0f;
+		velocity.y = 800.0f;
+		canDoubleJump = true;
 	}
 	else if(up && canDoubleJump && velocity.y < 400.0f) {
 		velocity.y = 800.0f;
 		canDoubleJump = false;
 	}
 
-	velocity = velocity + glm::vec2(0.0f, -1500.0f * deltaTime);
+	if (!grounded) { velocity = velocity + glm::vec2(0.0f, -1500.0f * deltaTime); }
 
 	while (getPos().x < -0.5f * static_cast<float>(Utils::SCR_WIDTH)) {
 		translate(X, static_cast<float>(Utils::SCR_WIDTH), true);
@@ -65,6 +74,10 @@ void CPlayer::update(float deltaTime)
 
 	while (getPos().y > 0.5f * static_cast<float>(Utils::SCR_HEIGHT)) {
 		translate(Y, -static_cast<float>(Utils::SCR_HEIGHT), true);
+	}
+
+	while (getPos().y < -0.5f * static_cast<float>(Utils::SCR_HEIGHT)) {
+		translate(Y, static_cast<float>(Utils::SCR_HEIGHT), true);
 	}
 
 	float hFriction = grounded ? 4.0f : 0.1f;
@@ -78,17 +91,67 @@ void CPlayer::update(float deltaTime)
 
 	if (velocity != glm::vec2(0.0f, 0.0f))
 	{
+		bool coll = false;
+		grounded = false;
+
 		translate(X, velocity.x * deltaTime, true);
-		if (getPos().y + velocity.y * deltaTime < -0.5f * static_cast<float>(Utils::SCR_HEIGHT)) {
-			translate(Y, -0.5f * static_cast<float>(Utils::SCR_HEIGHT), false);
-			velocity.y = 0.0f;
-			grounded = true;
-			canDoubleJump = true;
+		translate(Y, velocity.y * deltaTime, true);
+
+		for (CTile *tile : level) {
+			if (collider.collide(tile->GetCollider())) {
+				translate(X, -velocity.x * deltaTime, true);
+				translate(Y, -velocity.y * deltaTime, true);
+				coll = true;
+				break;
+			}
 		}
-		else {
-			translate(Y, velocity.y * deltaTime, true);
-			grounded = false;
+
+		float moveMax = velocity.length() * deltaTime;
+		float moveCount = 0.0f;
+		glm::vec2 step = velocity * deltaTime;
+		if (moveMax > 1.0f) {
+			step = glm::normalize(velocity);
 		}
+
+
+		while (moveCount < moveMax && coll) {
+			bool breaking = false;
+			translate(Y, step.y, true);
+
+			for (CTile *tile : level) {
+				if (collider.collide(tile->GetCollider())) {
+					translate(Y, -step.y, true);
+					breaking = true;
+					if (velocity.y > 0.0f) {
+						velocity.y = 0.0f;
+					}
+					else if (velocity.y <= 0.0f) {
+						velocity.y = 0.0f;
+						grounded = true;
+					}
+				}
+			}
+			if (breaking) break;
+			moveCount += fmin(moveMax + 0.01f, 1.0f);
+		}
+
+		moveCount = 0;
+
+		while (moveCount < moveMax && coll) {
+			bool breaking = false;
+			translate(X, step.x, true);
+
+			for (CTile *tile : level) {
+				if (collider.collide(tile->GetCollider())) {
+					translate(X, -step.x, true);
+					breaking = true;
+					velocity.x = 0.0f;
+				}
+			}
+			if (breaking) break;
+			moveCount += fmin(moveMax + 0.01f, 1.0f);
+		}	
+		
 	}
 
 	if (shoot && spear == 0)
@@ -108,7 +171,7 @@ void CPlayer::update(float deltaTime)
 			spear->setInWall(true);
 		}
 		spear->update(deltaTime);
-		if (collider.collide(spear->getCollider()) && spear->isInWall())
+		if (collider.collide(spear->getCollider()) && spear->isInWall() && punch)
 		{
 			delete spear;
 			spear = 0;

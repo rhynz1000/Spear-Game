@@ -8,6 +8,7 @@
 #include "TextLabel.h"
 #include "Button.h"
 #include "Player.h"
+#include "CLevel.h"
 
 class CGameManager
 {
@@ -22,6 +23,7 @@ private:
 	CInput* GameInput;
 	CPlayer player, player2;
 	CCamera camera;
+	CLevel level1;
 
 	float spdMultiplier = 1;
 
