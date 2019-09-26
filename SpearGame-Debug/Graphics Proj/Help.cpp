@@ -1,38 +1,35 @@
-#include "Menu.h"
+#include "Help.h"
 
 using namespace std;
 
-MMenu::MMenu()
+HMenu::HMenu()
 {
-	option = 0;
-	open = true;
-
-	GLfloat verticesMM[] = {
+	GLfloat verticesHM[] = {
 		 1.0f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 0.0f, // Top - Right
 		-1.0f,  1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f, // Top - Left
 		 1.0f, -1.0f, 0.0f,  1.0f, 1.0f, 0.0f,  1.0f, 1.0f, // Bot - Right
 		-1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f, // Bot - Left
 	};
 
-	GLuint indicesMM[] = {
+	GLuint indicesHM[] = {
 		1, 0, 2,
 		1, 2, 3
 	};
 
-	ProgramMM = shaderloaderMM.CreateProgram("Menu.vs", "Menu.fs");
-	MSelect = new CSelector;
-	HMenu1 = new HMenu;
+	open = false;
 
-	glGenVertexArrays(1, &vaoMM);
-	glBindVertexArray(vaoMM);
-	glGenBuffers(1, &vboMM);
-	glGenBuffers(1, &eboMM);
-	glGenTextures(1, &textureMM);
+	ProgramHM = shaderloaderHM.CreateProgram("Menu.vs", "Menu.fs");
 
-	glBindBuffer(GL_ARRAY_BUFFER, vboMM);
+	glGenVertexArrays(1, &vaoHM);
+	glBindVertexArray(vaoHM);
+	glGenBuffers(1, &vboHM);
+	glGenBuffers(1, &eboHM);
+	glGenTextures(1, &textureHM);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vboHM);
 	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(verticesMM),
-		verticesMM,
+		sizeof(verticesHM),
+		verticesHM,
 		GL_STATIC_DRAW);
 
 	glVertexAttribPointer(
@@ -62,13 +59,13 @@ MMenu::MMenu()
 		(GLvoid*)(6 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(2);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboMM);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboHM);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-		sizeof(indicesMM),
-		indicesMM,
+		sizeof(indicesHM),
+		indicesHM,
 		GL_STATIC_DRAW);
 
-	glBindTexture(GL_TEXTURE_2D, textureMM);
+	glBindTexture(GL_TEXTURE_2D, textureHM);
 
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CW);
@@ -76,7 +73,7 @@ MMenu::MMenu()
 
 	int width, height;
 	unsigned char* image = SOIL_load_image(
-		"Resources\\Textures\\MainMenu.png",
+		"images\\HelpMenu.png",
 		&width,
 		&height,
 		0,
@@ -98,72 +95,43 @@ MMenu::MMenu()
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-MMenu::~MMenu()
+HMenu::~HMenu()
 {
-	
+
 }
 
-void MMenu::Display()
+void HMenu::Display()
 {
 	int c = 0;
 
-		switch ((c = _getch())) {
-		case KEY_UP:
-			option = option - 1;
-			cout << option << endl;
-			break;
-
-		case KEY_DOWN:
-			option = option + 1;
-			cout << option << endl;
-			break;
-
-		case KEY_LEFT:
-			open = false;
-			break;
-
-		case KEY_RIGHT:
-			if (option == 0)
-			{
-
-			}
-			if (option == 1)
-			{
-				HMenu1->SetOpen();
-			}
-			else
-			{
-				exit;
-			}
-			break;
-		}
-
-		if (option > 2)
-		{
-			option = 0;
-		}
-		else if (option < 0)
-		{
-			option = 2;
-		}
+	switch ((c = _getch())) {
+	case KEY_LEFT:
+		open = false;
+		break;
+	}
 
 }
 
-void MMenu::RenderMM(int option)
+void HMenu::SetOpen()
 {
-	glUseProgram(ProgramMM);
+	open = true;
+}
+
+void HMenu::RenderHM()
+{
+	if (open == true)
+	{
+	glUseProgram(ProgramHM);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, textureMM);
-	glUniform1i(glGetUniformLocation(ProgramMM, "MainTex"), 0);
+	glBindTexture(GL_TEXTURE_2D, textureHM);
+	glUniform1i(glGetUniformLocation(ProgramHM, "MainTex"), 0);
 
-	glBindVertexArray(vaoMM);
+	glBindVertexArray(vaoHM);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 	glUseProgram(0);
 
 	Display();
-
-	MSelect->RenderCS(option);
-	HMenu1->RenderHM();
+}
 }

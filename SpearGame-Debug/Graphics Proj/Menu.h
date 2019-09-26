@@ -6,6 +6,8 @@
 #include "SOIL.h"
 
 #include "ShaderLoader.h"
+#include "Selector.h"
+#include "Help.h"
 
 #include <iostream>
 #include <conio.h>
@@ -19,9 +21,7 @@ public:
 	~MMenu();
 
 	void Display();
-	void RenderMM();
-	void UpdateMM();
-	int main(int argc, char **argv);
+	void RenderMM(int option);
 
 private:
 	int option;
@@ -33,6 +33,8 @@ private:
 	GLuint textureMM;
 
 	ShaderLoader shaderloaderMM;
+	CSelector* MSelect;
+	HMenu* HMenu1;
 
 	GLfloat verticesMM;
 	GLuint indicesMM;
