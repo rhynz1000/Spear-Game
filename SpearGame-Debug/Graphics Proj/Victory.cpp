@@ -1,35 +1,35 @@
-#include "Help.h"
+#include "Victory.h"
 
 using namespace std;
 
-HMenu::HMenu()
+EMenu::EMenu()
 {
-	GLfloat verticesHM[] = {
+	GLfloat verticesEM[] = {
 		 1.0f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 0.0f, // Top - Right
 		-1.0f,  1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f, // Top - Left
 		 1.0f, -1.0f, 0.0f,  1.0f, 1.0f, 0.0f,  1.0f, 1.0f, // Bot - Right
 		-1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f, // Bot - Left
 	};
 
-	GLuint indicesHM[] = {
+	GLuint indicesEM[] = {
 		1, 0, 2,
 		1, 2, 3
 	};
 
 	open = false;
 
-	ProgramHM = shaderloaderHM.CreateProgram("Resources/Shaders/Menu.vs", "Resources/Shaders/Menu.fs");
+	ProgramEM = shaderloaderEM.CreateProgram("Resources/Shaders/Menu.vs", "Resources/Shaders/Menu.fs");
 
-	glGenVertexArrays(1, &vaoHM);
-	glBindVertexArray(vaoHM);
-	glGenBuffers(1, &vboHM);
-	glGenBuffers(1, &eboHM);
-	glGenTextures(1, &textureHM);
+	glGenVertexArrays(1, &vaoEM);
+	glBindVertexArray(vaoEM);
+	glGenBuffers(1, &vboEM);
+	glGenBuffers(1, &eboEM);
+	glGenTextures(1, &textureEM);
 
-	glBindBuffer(GL_ARRAY_BUFFER, vboHM);
+	glBindBuffer(GL_ARRAY_BUFFER, vboEM);
 	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(verticesHM),
-		verticesHM,
+		sizeof(verticesEM),
+		verticesEM,
 		GL_STATIC_DRAW);
 
 	glVertexAttribPointer(
@@ -59,13 +59,13 @@ HMenu::HMenu()
 		(GLvoid*)(6 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(2);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboHM);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboEM);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-		sizeof(indicesHM),
-		indicesHM,
+		sizeof(indicesEM),
+		indicesEM,
 		GL_STATIC_DRAW);
 
-	glBindTexture(GL_TEXTURE_2D, textureHM);
+	glBindTexture(GL_TEXTURE_2D, textureEM);
 
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CW);
@@ -95,43 +95,24 @@ HMenu::HMenu()
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-HMenu::~HMenu()
+EMenu::~EMenu()
 {
 
 }
 
-void HMenu::Display()
-{
-	int c = 0;
-
-	switch ((c = _getch())) {
-	case KEY_LEFT:
-		open = false;
-		break;
-	}
-
-}
-
-void HMenu::SetOpen()
-{
-	open = true;
-}
-
-void HMenu::RenderHM()
+void EMenu::RenderEM()
 {
 	if (open == true)
 	{
-		glUseProgram(ProgramHM);
+		glUseProgram(ProgramEM);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, textureHM);
-		glUniform1i(glGetUniformLocation(ProgramHM, "MainTex"), 0);
+		glBindTexture(GL_TEXTURE_2D, textureEM);
+		glUniform1i(glGetUniformLocation(ProgramEM, "MainTex"), 0);
 
-		glBindVertexArray(vaoHM);
+		glBindVertexArray(vaoEM);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 		glUseProgram(0);
-
-		//Display();
 	}
 }

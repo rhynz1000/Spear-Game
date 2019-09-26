@@ -6,6 +6,7 @@ GLuint texture, texture1;
 
 void CGameManager::initalise(CInput* input)
 {
+	state = 0;
 	option = 0;
 	GameInput = input;
 	program = ShaderLoader::CreateProgram("Resources/Shaders/Basic.ver", "Resources/Shaders/Basic.frag");
@@ -27,6 +28,48 @@ void CGameManager::initalise(CInput* input)
 
 void CGameManager::update()
 {
+	bool up, down, confirm;
+
+	up = GameInput->checkKeyDownFirst(KEY, GLFW_KEY_W);
+	down = GameInput->checkKeyDown(KEY, GLFW_KEY_S);
+	confirm = GameInput->checkKeyDown(KEY, GLFW_KEY_SPACE);
+
+	if (confirm)
+	{
+		if (option = 0)
+		{
+			state = 1;
+		}
+		if (option = 1)
+		{
+			state = 2;
+		}
+		else
+		{
+			state = 0;
+		}
+	}
+
+	if (up)
+	{
+		option = option - 1;
+	}
+
+	if (down)
+	{
+		option = option + 1;
+	}
+		
+
+if (option > 2)
+{
+	option = 0;
+}
+else if (option < 0)
+{
+	option = 2;
+}
+
 	deltaTime = std::chrono::high_resolution_clock::now() - previousTime;
 	previousTime = std::chrono::high_resolution_clock::now();
 
@@ -39,7 +82,15 @@ void CGameManager::update()
 
 void CGameManager::render()
 {
-	level1.Render();
-	player.render();
-	//player2.render();
+	if (state = 0)
+	{
+		MMenu1->RenderMM(option);
+	}
+
+	if (state = 1)
+	{
+		level1.Render();
+		player.render();
+		//player2.render();
+	}
 }

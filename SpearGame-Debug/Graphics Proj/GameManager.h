@@ -31,6 +31,7 @@ private:
 
 	float spdMultiplier = 1;
 	int option;
+	int state;
 
 	std::chrono::duration<float> deltaTime;
 	std::chrono::time_point<std::chrono::high_resolution_clock> previousTime;

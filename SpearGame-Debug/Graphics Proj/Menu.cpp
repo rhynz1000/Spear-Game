@@ -19,9 +19,9 @@ MMenu::MMenu()
 		1, 2, 3
 	};
 
-	ProgramMM = shaderloaderMM.CreateProgram("Menu.vs", "Menu.fs");
+	ProgramMM = shaderloaderMM.CreateProgram("Resources/Shaders/Menu.vs", "Resources/Shaders/Menu.fs");
 	MSelect = new CSelector;
-	HMenu1 = new HMenu;
+	//HMenu1 = new HMenu;
 
 	glGenVertexArrays(1, &vaoMM);
 	glBindVertexArray(vaoMM);
@@ -162,8 +162,8 @@ void MMenu::RenderMM(int option)
 	glBindVertexArray(0);
 	glUseProgram(0);
 
-	Display();
+	//Display();
 
 	MSelect->RenderCS(option);
-	HMenu1->RenderHM();
+	//HMenu1->RenderHM();
 }

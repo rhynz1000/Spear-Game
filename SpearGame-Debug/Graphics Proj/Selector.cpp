@@ -14,7 +14,7 @@ CSelector::CSelector()
 		1, 3, 2
 	};
 
-	ProgramCS = shaderloaderCS.CreateProgram("Selector.vs", "Selector.fs");
+	ProgramCS = shaderloaderCS.CreateProgram("Resources/Shaders/Selector.vs", "Resources/Shaders/Selector.fs");
 
 	glGenVertexArrays(1, &vaoCS);
 	glBindVertexArray(vaoCS);
@@ -69,7 +69,7 @@ CSelector::CSelector()
 
 	int width, height;
 	unsigned char* image = SOIL_load_image(
-		"images\\Selector.png",
+		"Resources\\Textures\\Selector.png",
 		&width,
 		&height,
 		0,
