@@ -13,7 +13,7 @@ void CPlayer::initalise(CInput * input, CCamera* newCamera, float sizeH, float s
 	collider.initalise(-0.5, 0.5, 0.5, -0.5, this);
 }
 
-void CPlayer::update(float deltaTime, std::vector<CTile*> & level)
+void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &otherPlayer)
 {
 	bool up, down, left, right, shoot, punch;
 
@@ -35,7 +35,7 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level)
 		shoot = gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > -1;
 		up = gpState.buttons[GLFW_GAMEPAD_BUTTON_A];
 		horizontalSpeed = gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
-		horizontalSpeed = (abs(horizontalSpeed) > 0.2f) ? horizontalSpeed : 0.0f;
+		horizontalSpeed = (abs(horizontalSpeed) > 0.5f) ? horizontalSpeed : 0.0f;
 		spearDir = glm::normalize(glm::vec2(gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_X], -gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]));
 	}
 
@@ -166,15 +166,44 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level)
 		tipPos = glm::vec2(spear->getRotationMat() * glm::vec4(tipPos, 0.0f, 1.0f));
 		tipPos += spear->getPos();
 
-		if (tipPos.y < -0.5f * static_cast<float>(Utils::SCR_HEIGHT) || tipPos.x < -0.5f * static_cast<float>(Utils::SCR_WIDTH) || tipPos.x > 0.5f * static_cast<float>(Utils::SCR_WIDTH))
-		{
-			spear->setInWall(true);
+		for (CTile *tile : level) {
+			if (spear->getCollider().collide(tile->GetCollider())) {
+				spear->setInWall(true);
+				break;
+			}
 		}
+
+		while (spear->getPos().x < -0.5f * static_cast<float>(Utils::SCR_WIDTH)) {
+			spear->translate(X, static_cast<float>(Utils::SCR_WIDTH), true);
+		}
+		while (spear->getPos().x > 0.5f * static_cast<float>(Utils::SCR_WIDTH)) {
+			spear->translate(X, -static_cast<float>(Utils::SCR_WIDTH), true);
+		}
+
+		while (spear->getPos().y > 0.5f * static_cast<float>(Utils::SCR_HEIGHT)) {
+			spear->translate(Y, -static_cast<float>(Utils::SCR_HEIGHT), true);
+		}
+
+		while (spear->getPos().y < -0.5f * static_cast<float>(Utils::SCR_HEIGHT)) {
+			spear->translate(Y, static_cast<float>(Utils::SCR_HEIGHT), true);
+		}
+
 		spear->update(deltaTime);
 		if (collider.collide(spear->getCollider()) && spear->isInWall() && punch)
 		{
 			delete spear;
 			spear = 0;
+		}
+		else if (otherPlayer.getSpear() != 0 && collider.collide(otherPlayer.getSpear()->getCollider()) && otherPlayer.getSpear()->isInWall() && punch)
+		{
+			spear = otherPlayer.swapSpear(spear);
+			delete spear;
+			spear = 0;
+		}
+
+		if (otherPlayer.getSpear() != 0 && collider.collide(otherPlayer.getSpear()->getCollider()) && !otherPlayer.getSpear()->isInWall())
+		{
+			std::cout << "ow" << std::endl;
 		}
 	}
 }
@@ -186,4 +215,11 @@ void CPlayer::render()
 	{
 		spear->render(glm::mat4());
 	}
+}
+
+CSpear * CPlayer::swapSpear(CSpear * spear)
+{
+	CSpear* returnSpear = this->spear;
+	this->spear = spear;
+	return returnSpear;
 }

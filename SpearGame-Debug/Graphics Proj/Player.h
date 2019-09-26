@@ -14,9 +14,11 @@ public:
 	~CPlayer() {}
 
 	void initalise(CInput* input, CCamera* newCamera, float sizeH, float sizeW, float initalX, float initalY, GLuint prog, GLuint playerTex, int joy, GLuint initSpearTex);
-	void update(float deltaTime, std::vector<CTile*> & level);
+	void update(float deltaTime, std::vector<CTile*> & level, CPlayer &otherPlayer);
 	void render();
 	C2DCollider getCollider() { return collider; }
+	CSpear* getSpear() { return spear; }
+	CSpear* swapSpear(CSpear* spear);
 
 private:
 	CSpear* spear = 0;

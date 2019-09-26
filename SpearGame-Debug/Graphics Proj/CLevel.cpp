@@ -29,7 +29,7 @@ void CLevel::LoadFromCSV(std::string filePath, CCamera * camera, GLuint prog)
 			if (item == ',') continue;
 			if (item == '1') {
 				CTile* temp = new CTile();
-				temp->Initalise(camera, size, size, x * size + size / 2.0f - Utils::SCR_WIDTH / 2.0f, y * size + size / 2.0f - Utils::SCR_HEIGHT / 2.0f, prog, tex);
+				temp->Initalise(camera, size, size, -(x * size + size / 2.0f - Utils::SCR_WIDTH / 2.0f), -(y * size + size / 2.0f - Utils::SCR_HEIGHT / 2.0f), prog, tex);
 				tileArray.push_back(temp);
 			}
 			x++;
