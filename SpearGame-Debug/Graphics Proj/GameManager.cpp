@@ -19,6 +19,7 @@ void CGameManager::initalise(CInput* input)
 
 	MMenu1 = new MMenu;
 	HMenu1 = new HMenu;
+	EMenu1 = new EMenu;
 
 	level1.LoadFromCSV("Resources/Levels/SpearGameLevel1.csv", &camera, program);
 
@@ -28,6 +29,7 @@ void CGameManager::initalise(CInput* input)
 
 void CGameManager::update()
 {
+	
 	bool up, down, confirm;
 
 	up = GameInput->checkKeyDownFirst(KEY, GLFW_KEY_W);
@@ -36,15 +38,22 @@ void CGameManager::update()
 
 	if (confirm)
 	{
-		if (option = 0)
+		if (state = 0)
 		{
-			state = 1;
+			if (option = 0)
+			{
+				state = 1;
+			}
+			if (option = 1)
+			{
+				state = 2;
+			}
+			else
+			{
+				state = 0;
+			}
 		}
-		if (option = 1)
-		{
-			state = 2;
-		}
-		else
+		if (state = 2)
 		{
 			state = 0;
 		}
@@ -61,15 +70,15 @@ void CGameManager::update()
 	}
 		
 
-if (option > 2)
-{
-	option = 0;
-}
-else if (option < 0)
-{
-	option = 2;
-}
-
+	if (option > 2)
+	{
+		option = 0;
+	}
+	else if (option < 0)
+	{
+		option = 2;
+	}
+	
 	deltaTime = std::chrono::high_resolution_clock::now() - previousTime;
 	previousTime = std::chrono::high_resolution_clock::now();
 
@@ -92,5 +101,10 @@ void CGameManager::render()
 		level1.Render();
 		player.render();
 		//player2.render();
+	}
+
+	if (state = 2)
+	{
+		HMenu1->RenderHM();
 	}
 }

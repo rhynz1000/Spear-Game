@@ -11,6 +11,7 @@
 #include "CLevel.h"
 #include "Menu.h"
 #include "Help.h"
+#include "Victory.h"
 
 class CGameManager
 {
@@ -28,6 +29,7 @@ private:
 	CLevel level1;
 	MMenu* MMenu1;
 	HMenu* HMenu1;
+	EMenu* EMenu1;
 
 	float spdMultiplier = 1;
 	int option;

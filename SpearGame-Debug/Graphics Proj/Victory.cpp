@@ -73,7 +73,7 @@ EMenu::EMenu()
 
 	int width, height;
 	unsigned char* image = SOIL_load_image(
-		"Resources\\Textures\\HelpMenu.png",
+		"Resources\\Textures\\EndMenu.png",
 		&width,
 		&height,
 		0,
