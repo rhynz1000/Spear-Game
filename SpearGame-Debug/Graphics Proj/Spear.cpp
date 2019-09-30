@@ -14,6 +14,15 @@ void CSpear::update(float deltaTime)
 
 		float angle = atan2f(norm.x, norm.y);
 
-		rotate(Z, 90.0f - glm::degrees(angle), false);
+		angle = glm::degrees(angle);
+
+		float ang = angle / 45;
+
+		ang = std::floorf(ang) * 45;
+		angle = (fmod(ang, 45) < 22.5) ? 0 : 45;
+
+		angle += ang;
+
+		rotate(Z, 90.0f - angle, false);
 	}
 }

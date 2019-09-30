@@ -24,7 +24,7 @@ void CGameManager::initalise(CInput* input)
 	level1.LoadFromCSV("Resources/Levels/SpearGameLevel1.csv", &camera, program);
 
 	player.initalise(GameInput, &camera, 100, 100, 0, 300, program, texture1, 0, texture);
-	//player2.initalise(GameInput, &camera, 100, 100, 0, 0, program, texture, 1, texture1);
+	player2.initalise(GameInput, &camera, 100, 100, 0, 0, program, texture, 1, texture1);
 }
 
 void CGameManager::update()
@@ -85,8 +85,8 @@ void CGameManager::update()
 	float DT = deltaTime.count() > 0.1f ? 0.1f : deltaTime.count();
 	DT *= spdMultiplier;
 	
-	player.update(DT, level1.GetTiles());
-	//player2.update(DT);
+	player.update(DT, level1.GetTiles(), player2);
+	player2.update(DT, level1.GetTiles(), player);
 }
 
 void CGameManager::render()
