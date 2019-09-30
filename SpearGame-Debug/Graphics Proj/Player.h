@@ -31,6 +31,6 @@ private:
 	bool grounded = false;
 	bool canDoubleJump = true;
 	int joystick = 0;
-	C2DCollider collider;
-
+	C2DCollider collider, meleeRange;
+	bool punchLast = false, shootLast = false, upLast = false;
 };

@@ -11,6 +11,7 @@ void CPlayer::initalise(CInput * input, CCamera* newCamera, float sizeH, float s
 	joystick = joy;
 
 	collider.initalise(-0.5, 0.5, 0.5, -0.5, this);
+	meleeRange.initalise(0.0f, 1.0f, 0.5f, 0.5f, this);
 }
 
 void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &otherPlayer)
@@ -31,9 +32,12 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 	if (gameInput->isJoystickValid(joystick))
 	{
 		GLFWgamepadstate gpState = gameInput->getJoystickInput(joystick);
-		punch = gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > -1;
-		shoot = gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > -1;
-		up = gpState.buttons[GLFW_GAMEPAD_BUTTON_A];
+		punch = gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > -1 && !punchLast;
+		punchLast = gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > -1;
+		shoot = gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > -1 && !shootLast;
+		shootLast = gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > -1;
+		up = gpState.buttons[GLFW_GAMEPAD_BUTTON_A] && !upLast;
+		upLast = gpState.buttons[GLFW_GAMEPAD_BUTTON_A];
 		horizontalSpeed = gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
 		horizontalSpeed = (abs(horizontalSpeed) > 0.5f) ? horizontalSpeed : 0.0f;
 		spearDir = glm::normalize(glm::vec2(gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_X], -gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]));
@@ -206,6 +210,21 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 			std::cout << "ow" << std::endl;
 		}
 	}
+
+	if (spearDir.x < 0)
+	{
+		meleeRange.initalise(1.0f, 0.0f, 0.5f, 0.5f, this);
+	}
+	else if (spearDir.x > 0)
+	{
+		meleeRange.initalise(0.0f, 1.0f, 0.5f, 0.5f, this);
+	}
+
+	if (punch && meleeRange.collide(otherPlayer.getCollider()))
+	{
+		std::cout << "hit" << std::endl;
+	}
+	
 }
 
 void CPlayer::render()
