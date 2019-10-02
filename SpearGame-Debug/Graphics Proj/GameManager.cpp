@@ -24,8 +24,8 @@ void CGameManager::initalise(CInput* input)
 	EMenu1.Initalise(&camera, Utils::SCR_HEIGHT, Utils::SCR_WIDTH, 0, 0, program, TextureLoader::CreateTexture("Resources/Textures/EndMenu.png"));
 
 	Selector.Initalise(&camera, 30, 50, -130, 0, program, TextureLoader::CreateTexture("Resources/Textures/Selector.png"));
-
-	level1.LoadFromCSV("Resources/Levels/SpearGameLevel1.csv", &camera, program);
+	
+	srand(time(NULL));
 
 	player.initalise(GameInput, &camera, 100, 100, 0, 300, program, texture1, 0, texture);
 	player2.initalise(GameInput, &camera, 100, 100, 0, 0, program, texture, 1, texture1);
@@ -50,6 +50,7 @@ void CGameManager::update()
 			{
 				if (option == 0)
 				{
+					loadLevel(level1);
 					state = Game;
 				}
 				else if (option == 1)
@@ -175,4 +176,16 @@ void CGameManager::render()
 	default:
 		break;
 	}	
+}
+
+void CGameManager::loadLevel(CLevel & level)
+{
+	std::vector<std::string> levelPaths;
+	for (std::experimental::filesystem::directory_entry entry : std::experimental::filesystem::directory_iterator("Resources/Levels")) {
+		if (entry.path().extension() == ".csv") {
+			levelPaths.push_back(entry.path().string());
+		}
+	}
+	level.LoadFromCSV(levelPaths[rand() % levelPaths.size()], &camera, program);
+	levelPaths.clear();
 }

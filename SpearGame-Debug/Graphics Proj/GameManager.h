@@ -26,7 +26,8 @@ public:
 	void render();
 	void spdup() { spdMultiplier++; }
 	void spddown() { spdMultiplier--; if (spdMultiplier < 0)spdMultiplier = 0; }
-
+	//Loads a random level into the level object passed in
+	void loadLevel(CLevel & level);
 private:
 	CInput* GameInput;
 	CPlayer player, player2;

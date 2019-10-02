@@ -16,6 +16,11 @@ CLevel::~CLevel()
 
 void CLevel::LoadFromCSV(std::string filePath, CCamera * camera, GLuint prog)
 {
+	std::vector<CTile*>::iterator itr = tileArray.begin();
+	while (tileArray.size() > 0) {
+		delete* itr;
+		itr = tileArray.erase(itr);
+	}
 	const float size = 60.0f;
 	GLuint tex = TextureLoader::CreateTexture("Resources/Textures/Rayman.jpg");
 	std::ifstream file;
