@@ -12,6 +12,8 @@ void CPlayer::initalise(CInput * input, CCamera* newCamera, float sizeH, float s
 
 	collider.initalise(-0.5, 0.5, 0.5, -0.5, this);
 	meleeRange.initalise(0.0f, 1.0f, 0.5f, 0.5f, this);
+
+	spawnPoint = glm::vec2(initalX, initalY);
 }
 
 void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &otherPlayer)
@@ -208,6 +210,7 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 		if (otherPlayer.getSpear() != 0 && collider.collide(otherPlayer.getSpear()->getCollider()) && !otherPlayer.getSpear()->isInWall())
 		{
 			std::cout << "ow" << std::endl;
+			hit(100);
 		}
 	}
 
@@ -223,6 +226,7 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 	if (punch && meleeRange.collide(otherPlayer.getCollider()))
 	{
 		std::cout << "hit" << std::endl;
+		otherPlayer.hit(10);
 	}
 	
 }
@@ -233,6 +237,26 @@ void CPlayer::render()
 	if (spear != 0)
 	{
 		spear->render(glm::mat4());
+	}
+}
+
+void CPlayer::hit(float damage)
+{
+	health -= damage;
+}
+
+void CPlayer::reset()
+{
+	velocity = glm::vec2();
+	health = maxHealth;
+
+	translate(X, spawnPoint.x, false);
+	translate(Y, spawnPoint.y, false);
+
+	if (spear)
+	{
+		delete spear;
+		spear = 0;
 	}
 }
 

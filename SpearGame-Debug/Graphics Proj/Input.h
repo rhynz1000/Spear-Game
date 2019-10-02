@@ -6,7 +6,6 @@
 enum ORIGIN
 {
 	KEY,
-	SKEY,
 	MOUSE,
 };
 
@@ -43,7 +42,6 @@ private:
 
 	//array for keys
 	InputState KeyState[348]{};
-	InputState spKeyState[21]{};
 	InputState MouseState[5]{};
 
 	//mouse location;

@@ -16,6 +16,10 @@ public:
 	void initalise(CInput* input, CCamera* newCamera, float sizeH, float sizeW, float initalX, float initalY, GLuint prog, GLuint playerTex, int joy, GLuint initSpearTex);
 	void update(float deltaTime, std::vector<CTile*> & level, CPlayer &otherPlayer);
 	void render();
+	void hit(float damage);
+	void reset();
+
+	float getHealth() { return health; }
 	C2DCollider getCollider() { return collider; }
 	CSpear* getSpear() { return spear; }
 	CSpear* swapSpear(CSpear* spear);
@@ -25,12 +29,15 @@ private:
 	CInput* gameInput;
 	CCamera* camera;
 	GLuint spearProg, spearTex;
-	float speed = 400.0f;
-	float spearSpd = 1000.0f;
+	const float speed = 400.0f;
+	const float spearSpd = 1000.0f;
 	glm::vec2 velocity;
 	bool grounded = false;
 	bool canDoubleJump = true;
 	int joystick = 0;
 	C2DCollider collider, meleeRange;
 	bool punchLast = false, shootLast = false, upLast = false;
+	float health = 100;
+	const float maxHealth = 100;
+	glm::vec2 spawnPoint;
 };
