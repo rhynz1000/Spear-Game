@@ -57,6 +57,15 @@
     <ClCompile Include="Spear.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CCollider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CTile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CLevel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ShaderLoader.h">
@@ -99,6 +108,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Spear.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CCollider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CTile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CLevel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

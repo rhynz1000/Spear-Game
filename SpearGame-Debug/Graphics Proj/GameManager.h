@@ -8,6 +8,15 @@
 #include "TextLabel.h"
 #include "Button.h"
 #include "Player.h"
+#include "CLevel.h"
+
+enum GameState
+{
+	MainMenu,
+	Game,
+	HelpMenu,
+	EndScreen,
+};
 
 class CGameManager
 {
@@ -20,10 +29,18 @@ public:
 
 private:
 	CInput* GameInput;
-	CPlayer player;
+	CPlayer player, player2;
 	CCamera camera;
+	CLevel level1;
+
+	CQuad MMenu1;
+	CQuad HMenu1;
+	CQuad EMenu1;
+	CQuad Selector;
 
 	float spdMultiplier = 1;
+	int option;
+	GameState state;
 
 	std::chrono::duration<float> deltaTime;
 	std::chrono::time_point<std::chrono::high_resolution_clock> previousTime;

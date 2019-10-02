@@ -1,24 +1,49 @@
 #include "Player.h"
 
-void CPlayer::initalise(CInput * input, CCamera* newCamera, float sizeH, float sizeW, float initalX, float initalY, GLuint prog, GLuint tex)
+void CPlayer::initalise(CInput * input, CCamera* newCamera, float sizeH, float sizeW, float initalX, float initalY, GLuint prog, GLuint playerTex, int joy, GLuint initSpearTex)
 {
-	CQuad::Initalise(newCamera, sizeH, sizeW, initalX, initalY, prog, tex);
+	CQuad::Initalise(newCamera, sizeH, sizeW, initalX, initalY, prog, playerTex);
 
 	spearProg = prog;
-	spearTex = tex;
+	spearTex = initSpearTex;
 	gameInput = input;
 	camera = newCamera;
+	joystick = joy;
+
+	collider.initalise(-0.5, 0.5, 0.5, -0.5, this);
+	meleeRange.initalise(0.0f, 1.0f, 0.5f, 0.5f, this);
+
+	spawnPoint = glm::vec2(initalX, initalY);
 }
 
-void CPlayer::update(float deltaTime)
+void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &otherPlayer)
 {
+	bool up, down, left, right, shoot, punch;
 
-	bool up, down, left, right, shoot;
+	punch = gameInput->checkKeyDownFirst(KEY, GLFW_KEY_Q);
 	shoot = gameInput->checkKeyDownFirst(KEY, GLFW_KEY_E);
 	up = gameInput->checkKeyDownFirst(KEY, GLFW_KEY_SPACE);
 	left = gameInput->checkKeyDown(KEY, GLFW_KEY_A);
 	right = gameInput->checkKeyDown(KEY, GLFW_KEY_D);
 	float horizontalSpeed = (left && !right) || (right && !left) ? (right ? 1.0f : -1.0f) : 0.0f;
+	glm::vec2 spearDir = glm::vec2(0.5f, 0.5f);
+	
+	float halfScrWidth = ((float)Utils::SCR_WIDTH) / 2;
+	float halfScrHeight = ((float)Utils::SCR_HEIGHT) / 2;
+
+	if (gameInput->isJoystickValid(joystick))
+	{
+		GLFWgamepadstate gpState = gameInput->getJoystickInput(joystick);
+		punch = gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > -1 && !punchLast;
+		punchLast = gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > -1;
+		shoot = gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > -1 && !shootLast;
+		shootLast = gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > -1;
+		up = gpState.buttons[GLFW_GAMEPAD_BUTTON_A] && !upLast;
+		upLast = gpState.buttons[GLFW_GAMEPAD_BUTTON_A];
+		horizontalSpeed = gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
+		horizontalSpeed = (abs(horizontalSpeed) > 0.5f) ? horizontalSpeed : 0.0f;
+		spearDir = glm::normalize(glm::vec2(gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_X], -gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]));
+	}
 
 	if (horizontalSpeed != 0.0f) {
 		velocity = glm::vec2(velocity.x + horizontalSpeed * deltaTime * speed * (grounded ? 5.0f : 1.0f), velocity.y);
@@ -30,15 +55,21 @@ void CPlayer::update(float deltaTime)
 		}
 	}
 
+	if (up && !grounded)
+	{
+		std::cout << "jump no ground: " << velocity.x << ", "<< velocity.y << std::endl;
+	}
+
 	if (up && grounded ) {
-		velocity.y += 800.0f;
+		velocity.y = 800.0f;
+		canDoubleJump = true;
 	}
 	else if(up && canDoubleJump && velocity.y < 400.0f) {
 		velocity.y = 800.0f;
 		canDoubleJump = false;
 	}
 
-	velocity = velocity + glm::vec2(0.0f, -1500.0f * deltaTime);
+	if (!grounded) { velocity = velocity + glm::vec2(0.0f, -1500.0f * deltaTime); }
 
 	while (getPos().x < -0.5f * static_cast<float>(Utils::SCR_WIDTH)) {
 		translate(X, static_cast<float>(Utils::SCR_WIDTH), true);
@@ -49,6 +80,10 @@ void CPlayer::update(float deltaTime)
 
 	while (getPos().y > 0.5f * static_cast<float>(Utils::SCR_HEIGHT)) {
 		translate(Y, -static_cast<float>(Utils::SCR_HEIGHT), true);
+	}
+
+	while (getPos().y < -0.5f * static_cast<float>(Utils::SCR_HEIGHT)) {
+		translate(Y, static_cast<float>(Utils::SCR_HEIGHT), true);
 	}
 
 	float hFriction = grounded ? 4.0f : 0.1f;
@@ -62,34 +97,138 @@ void CPlayer::update(float deltaTime)
 
 	if (velocity != glm::vec2(0.0f, 0.0f))
 	{
+		bool coll = false;
+		grounded = false;
+
 		translate(X, velocity.x * deltaTime, true);
-		if (getPos().y + velocity.y * deltaTime < -0.5f * static_cast<float>(Utils::SCR_HEIGHT)) {
-			translate(Y, -0.5f * static_cast<float>(Utils::SCR_HEIGHT), false);
-			velocity.y = 0.0f;
-			grounded = true;
-			canDoubleJump = true;
+		translate(Y, velocity.y * deltaTime, true);
+
+		for (CTile *tile : level) {
+			if (collider.collide(tile->GetCollider())) {
+				translate(X, -velocity.x * deltaTime, true);
+				translate(Y, -velocity.y * deltaTime, true);
+				coll = true;
+				break;
+			}
 		}
-		else {
-			translate(Y, velocity.y * deltaTime, true);
-			grounded = false;
+
+		float moveMax = velocity.length() * deltaTime;
+		float moveCount = 0.0f;
+		glm::vec2 step = velocity * deltaTime;
+		if (moveMax > 1.0f) {
+			step = glm::normalize(velocity);
 		}
+
+
+		while (moveCount < moveMax && coll) {
+			bool breaking = false;
+			translate(Y, step.y, true);
+
+			for (CTile *tile : level) {
+				if (collider.collide(tile->GetCollider())) {
+					translate(Y, -step.y, true);
+					breaking = true;
+					if (velocity.y > 0.0f) {
+						velocity.y = 0.0f;
+					}
+					else if (velocity.y <= 0.0f) {
+						velocity.y = 0.0f;
+						grounded = true;
+					}
+				}
+			}
+			if (breaking) break;
+			moveCount += fmin(moveMax + 0.01f, 1.0f);
+		}
+
+		moveCount = 0;
+
+		while (moveCount < moveMax && coll) {
+			bool breaking = false;
+			translate(X, step.x, true);
+
+			for (CTile *tile : level) {
+				if (collider.collide(tile->GetCollider())) {
+					translate(X, -step.x, true);
+					breaking = true;
+					velocity.x = 0.0f;
+				}
+			}
+			if (breaking) break;
+			moveCount += fmin(moveMax + 0.01f, 1.0f);
+		}	
+		
 	}
 
 	if (shoot && spear == 0)
 	{
-		spear = new CSpear(glm::vec2(600,400) + velocity);
+		spear = new CSpear(spearDir*spearSpd + velocity);
 		spear->Initalise(camera, 10,50, getPos().x, getPos().y, spearProg, spearTex);
 	}
 
 	if (spear != 0)
 	{
+		glm::vec2 tipPos = glm::vec2(spear->getScale().x / 2, 0);
+		tipPos = glm::vec2(spear->getRotationMat() * glm::vec4(tipPos, 0.0f, 1.0f));
+		tipPos += spear->getPos();
+
+		for (CTile *tile : level) {
+			if (spear->getCollider().collide(tile->GetCollider())) {
+				spear->setInWall(true);
+				break;
+			}
+		}
+
+		while (spear->getPos().x < -0.5f * static_cast<float>(Utils::SCR_WIDTH)) {
+			spear->translate(X, static_cast<float>(Utils::SCR_WIDTH), true);
+		}
+		while (spear->getPos().x > 0.5f * static_cast<float>(Utils::SCR_WIDTH)) {
+			spear->translate(X, -static_cast<float>(Utils::SCR_WIDTH), true);
+		}
+
+		while (spear->getPos().y > 0.5f * static_cast<float>(Utils::SCR_HEIGHT)) {
+			spear->translate(Y, -static_cast<float>(Utils::SCR_HEIGHT), true);
+		}
+
+		while (spear->getPos().y < -0.5f * static_cast<float>(Utils::SCR_HEIGHT)) {
+			spear->translate(Y, static_cast<float>(Utils::SCR_HEIGHT), true);
+		}
+
 		spear->update(deltaTime);
-		if (spear->getPos().y < -0.5f * static_cast<float>(Utils::SCR_HEIGHT))
+		if (collider.collide(spear->getCollider()) && spear->isInWall() && punch)
 		{
 			delete spear;
 			spear = 0;
 		}
+		else if (otherPlayer.getSpear() != 0 && collider.collide(otherPlayer.getSpear()->getCollider()) && otherPlayer.getSpear()->isInWall() && punch)
+		{
+			spear = otherPlayer.swapSpear(spear);
+			delete spear;
+			spear = 0;
+		}
+
+		if (otherPlayer.getSpear() != 0 && collider.collide(otherPlayer.getSpear()->getCollider()) && !otherPlayer.getSpear()->isInWall())
+		{
+			std::cout << "ow" << std::endl;
+			hit(100);
+		}
 	}
+
+	if (spearDir.x < 0)
+	{
+		meleeRange.initalise(1.0f, 0.0f, 0.5f, 0.5f, this);
+	}
+	else if (spearDir.x > 0)
+	{
+		meleeRange.initalise(0.0f, 1.0f, 0.5f, 0.5f, this);
+	}
+
+	if (punch && meleeRange.collide(otherPlayer.getCollider()))
+	{
+		std::cout << "hit" << std::endl;
+		otherPlayer.hit(10);
+	}
+	
 }
 
 void CPlayer::render()
@@ -99,4 +238,31 @@ void CPlayer::render()
 	{
 		spear->render(glm::mat4());
 	}
+}
+
+void CPlayer::hit(float damage)
+{
+	health -= damage;
+}
+
+void CPlayer::reset()
+{
+	velocity = glm::vec2();
+	health = maxHealth;
+
+	translate(X, spawnPoint.x, false);
+	translate(Y, spawnPoint.y, false);
+
+	if (spear)
+	{
+		delete spear;
+		spear = 0;
+	}
+}
+
+CSpear * CPlayer::swapSpear(CSpear * spear)
+{
+	CSpear* returnSpear = this->spear;
+	this->spear = spear;
+	return returnSpear;
 }

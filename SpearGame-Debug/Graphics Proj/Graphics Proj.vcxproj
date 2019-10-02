@@ -140,6 +140,9 @@
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CCollider.cpp" />
+    <ClCompile Include="CLevel.cpp" />
+    <ClCompile Include="CTile.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -156,6 +159,9 @@
     <ClInclude Include="Audio.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CCollider.h" />
+    <ClInclude Include="CLevel.h" />
+    <ClInclude Include="CTile.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Player.h" />

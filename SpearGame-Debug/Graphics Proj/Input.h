@@ -6,7 +6,6 @@
 enum ORIGIN
 {
 	KEY,
-	SKEY,
 	MOUSE,
 };
 
@@ -28,6 +27,8 @@ public:
 	bool checkKeyUpFirst(ORIGIN orig, int key);//check up first for all keys
 	void getMousePos(int &X, int &Y);//getting mouse position
 	glm::vec2 getMousePos();
+	bool isJoystickValid(int joystick) { return glfwJoystickIsGamepad(joystick); }
+	GLFWgamepadstate getJoystickInput(int joystick);
 
 private:
 	//input states for keys
@@ -41,7 +42,6 @@ private:
 
 	//array for keys
 	InputState KeyState[348]{};
-	InputState spKeyState[21]{};
 	InputState MouseState[5]{};
 
 	//mouse location;

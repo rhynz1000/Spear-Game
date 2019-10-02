@@ -29,13 +29,12 @@ public:
 	void translate(AXIS axis, float amount, bool relative);//sets translation matrices
 	void scale(AXIS axis, float amount);//sets scale matrices
 	glm::mat4 getModel();//calculates model matrix and returns it
+	glm::mat4 *getRefToModel() { getModel(); return &model; }
 	glm::vec2 getPos() { return glm::vec2(objPosition); }
 	glm::vec2 getScale() { return glm::vec2(objScale); }
+	glm::mat4 getRotationMat() { return rotationMatrixZ; }
 
 	virtual void render(glm::mat4 anchor);//renders the shape
-
-	bool collision(C2DShape* other);
-	bool collision(std::vector<C2DShape*> other);
 
 private:
 	//transformation matrices
@@ -44,6 +43,8 @@ private:
 	glm::mat4 rotationMatrixY = glm::mat4();
 	glm::mat4 rotationMatrixZ = glm::mat4();
 	glm::mat4 scaleMatrix = glm::mat4();
+
+	glm::mat4 model = glm::mat4();
 
 	GLuint VAO;//vao for the shape
 

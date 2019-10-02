@@ -59,7 +59,7 @@ void CInput::MouseClick(int button, int state)//mouse click states
 void CInput::Update()// update for up and down fist implementation
 {
 	//iterates through all the arrays making any button with up or down first into corollating up or down
-	for (int i = 0; i < 255; i++)
+	for (int i = 0; i < 348; i++)
 	{
 		if (KeyState[i] == UP_FIRST)
 		{
@@ -68,18 +68,6 @@ void CInput::Update()// update for up and down fist implementation
 		else if (KeyState[i] == DOWN_FIRST)
 		{
 			KeyState[i] = DOWN;
-		}
-	}
-
-	for (int i = 0; i < 21; i++)
-	{
-		if (spKeyState[i] == UP_FIRST)
-		{
-			spKeyState[i] = UP;
-		}
-		else if (spKeyState[i] == DOWN_FIRST)
-		{
-			spKeyState[i] = DOWN;
 		}
 	}
 
@@ -210,3 +198,11 @@ glm::vec2 CInput::getMousePos()//returns the mouse position in the window
 {
 	return glm::vec2(mousex, mousey);
 }
+
+GLFWgamepadstate CInput::getJoystickInput(int joystick)
+{
+	GLFWgamepadstate state;
+	glfwGetGamepadState(joystick, &state);
+	return state;
+}
+

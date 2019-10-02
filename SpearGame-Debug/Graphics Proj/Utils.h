@@ -10,6 +10,8 @@
 
 //libary includes
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <ctime>
 #include <chrono>
 
@@ -24,6 +26,6 @@
 class Utils
 {
 public:
-	static const unsigned int SCR_WIDTH = 800;
-	static const unsigned int SCR_HEIGHT = 600;
+	static const unsigned int SCR_WIDTH = 1920;
+	static const unsigned int SCR_HEIGHT = 1080;
 };
