@@ -185,7 +185,7 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 
 		CAudio::getInstance()->playSound("Throw", 0.3);
 		spear = new CSpear(spearDir*spearSpd + velocity);
-		spear->Initalise(camera, 10,50, getPos().x, getPos().y, spearProg, spearTex);
+		spear->Initalise(camera, 30,60, getPos().x, getPos().y, spearProg, spearTex);
 	}
 
 	if (spear != 0)
@@ -195,7 +195,7 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 		tipPos += spear->getPos();
 
 		for (CTile *tile : level) {
-			if (spear->getCollider().collide(tile->GetCollider())) {
+			if (!spear->isInWall() && spear->getCollider().collide(tile->GetCollider())) {
 				CAudio::getInstance()->playSound("SpearLand", 0.3);
 				spear->setInWall(true);
 				break;

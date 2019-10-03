@@ -20,7 +20,7 @@ void CGameManager::initalise(CInput* input)
 
 	Selector.Initalise(&camera, 30, 50, -130, 0, program, TextureLoader::get("Selector"));
 
-	player.initalise(GameInput, &camera, 100, 50, 0, 300, program, TextureLoader::get("player1"), 0, TextureLoader::get("spear"));
+	player1.initalise(GameInput, &camera, 100, 50, 0, 300, program, TextureLoader::get("player1"), 0, TextureLoader::get("spear"));
 	player2.initalise(GameInput, &camera, 100, 50, 0, 0, program, TextureLoader::get("player2"), 1, TextureLoader::get("spear"));
 	victory.init("", "Resources/Fonts/arial.ttf", glm::vec2(), glm::vec3(), 1);
 	p1Health.init("P1 Health: ", "Resources/Fonts/arial.ttf", glm::vec2((-(int)Utils::SCR_WIDTH / 2) + 10, (-(int)Utils::SCR_HEIGHT / 2) + 20), glm::vec3(), 1);
@@ -193,9 +193,12 @@ void CGameManager::update()
 				victory.SetText(std::to_string(player1.getScore()) + " : " + std::to_string(player2.getScore()));
 				victory.SetPosition(glm::vec2(-50, 0));
 			}
+			player1.reset();
+			player2.reset();
 			state = EndScreen;
 		}
 	}
+	CAudio::getInstance()->update();
 }
 
 void CGameManager::render()

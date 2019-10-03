@@ -17,7 +17,7 @@ public:
 	void initalise(CInput* input, CCamera* newCamera, float sizeH, float sizeW, float initalX, float initalY, GLuint prog, GLuint playerTex, int joy, GLuint initSpearTex);
 	void update(float deltaTime, std::vector<CTile*> & level, CPlayer &otherPlayer);
 	void render();
-	void hit(float damage) { health -= damage; }
+	void hit(float damage) { health -= damage; CAudio::getInstance()->playSound("Hit", 0.3f); }
 	void reset();
 	void resetScore() { score = 0; }
 	void addPoint() { score++; }
