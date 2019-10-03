@@ -241,7 +241,7 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 		meleeRange.initalise(0.0f, 1.0f, 0.5f, 0.5f, this);
 	}
 
-	if (punch && meleeRange.collide(otherPlayer.getCollider()))
+	if (punch && meleeRange.collide(otherPlayer.getCollider()) && spear == 0)
 	{
 		//std::cout << "hit" << std::endl;
 		otherPlayer.hit(10);

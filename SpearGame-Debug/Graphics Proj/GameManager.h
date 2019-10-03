@@ -53,5 +53,5 @@ private:
 	std::chrono::duration<float> deltaTime;
 	std::chrono::time_point<std::chrono::high_resolution_clock> previousTime;
 
-	TextLabel victory, p1Health, p2Health, p1Dash, p2Dash;
+	TextLabel victory, p1Health, p2Health, p1Dash, p2Dash, score;
 };

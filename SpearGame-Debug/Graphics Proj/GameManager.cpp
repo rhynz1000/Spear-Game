@@ -27,6 +27,7 @@ void CGameManager::initalise(CInput* input)
 	p2Health.init("P2 Health: ", "Resources/Fonts/arial.ttf", glm::vec2(((int)Utils::SCR_WIDTH / 2) - 350, (-(int)Utils::SCR_HEIGHT / 2) + 20), glm::vec3(1, 1, 1), 1);
 	p1Dash.init("P1 Dash: ", "Resources/Fonts/arial.ttf", glm::vec2((-(int)Utils::SCR_WIDTH / 2) + 10, (-(int)Utils::SCR_HEIGHT / 2) + 60), glm::vec3(1, 1, 1), 1);
 	p2Dash.init("P2 Dash: ", "Resources/Fonts/arial.ttf", glm::vec2(((int)Utils::SCR_WIDTH / 2) - 350, (-(int)Utils::SCR_HEIGHT / 2) + 60), glm::vec3(1, 1, 1), 1);
+	score.init("0 : 0", "Resources/Fonts/arial.ttf", glm::vec2(-50, ((int)Utils::SCR_HEIGHT / 2) - 60), glm::vec3(1,1,1), 1);
 
 }
 
@@ -95,6 +96,7 @@ void CGameManager::update()
 				{
 					player1.resetScore();
 					player2.resetScore();
+					score.SetText("0 : 0");
 					state = MainMenu;
 				}
 				else
@@ -189,21 +191,24 @@ void CGameManager::update()
 				victory.SetText("Player 1 wins");
 				victory.SetPosition(glm::vec2(-160, 0));
 				endgame = true;
+				state = EndScreen;
 			}
 			else if (player2.getScore() >= 2)
 			{
 				victory.SetText("Player 2 wins");
 				victory.SetPosition(glm::vec2(-160, 0));
 				endgame = true;
+				state = EndScreen;
 			}
 			else
 			{
-				victory.SetText(std::to_string(player1.getScore()) + " : " + std::to_string(player2.getScore()));
-				victory.SetPosition(glm::vec2(-50, 0));
+				score.SetText(std::to_string(player1.getScore()) + " : " + std::to_string(player2.getScore()));
+				loadLevel(level1);
+				//victory.SetPosition(glm::vec2(-50, 0));
 			}
 			player1.reset();
 			player2.reset();
-			state = EndScreen;
+			//state = Game;
 		}
 	}
 	CAudio::getInstance()->update();
@@ -228,6 +233,7 @@ void CGameManager::render()
 		p2Health.Render();
 		p1Dash.Render();
 		p2Dash.Render();
+		score.Render();
 	}
 		break;
 	case HelpMenu:
