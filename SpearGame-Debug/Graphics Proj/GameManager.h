@@ -6,7 +6,6 @@
 #include "Quad.h"
 #include "Audio.h"
 #include "TextLabel.h"
-#include "Button.h"
 #include "Player.h"
 #include "CLevel.h"
 
@@ -26,10 +25,11 @@ public:
 	void render();
 	void spdup() { spdMultiplier++; }
 	void spddown() { spdMultiplier--; if (spdMultiplier < 0)spdMultiplier = 0; }
+	void devModeSwitch() { dev = !dev; }
 
 private:
 	CInput* GameInput;
-	CPlayer player, player2;
+	CPlayer player1, player2;
 	CCamera camera;
 	CLevel level1;
 
@@ -39,9 +39,17 @@ private:
 	CQuad Selector;
 
 	float spdMultiplier = 1;
+
 	int option;
 	GameState state;
+	bool axisLast = false;
+	bool confirmLast = false;
+
+	bool dev = false;
+	bool endgame = false;
 
 	std::chrono::duration<float> deltaTime;
 	std::chrono::time_point<std::chrono::high_resolution_clock> previousTime;
+
+	TextLabel victory, p1Health, p2Health, p1Dash, p2Dash;
 };

@@ -30,14 +30,15 @@ struct FontChar
 class TextLabel {
 public:
 	//textlabel constructor
-	TextLabel(
-		std::string newText, 
-		std::string font, 
-		glm::vec2 pos, 
-		glm::vec3 colour		= glm::vec3(1.0f, 1.0f, 1.0f), 
-		float scale			= 1.0f);
+	TextLabel() {};
 	
 	~TextLabel() {};//destructor
+
+	void init(std::string newText,
+		std::string font,
+		glm::vec2 pos,
+		glm::vec3 colour = glm::vec3(1.0f, 1.0f, 1.0f),
+		float scale = 1.0f);
 
 	void Render();//render function
 	void SetText(std::string newText) { text = newText; };//sets text

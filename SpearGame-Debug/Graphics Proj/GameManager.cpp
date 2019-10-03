@@ -27,8 +27,14 @@ void CGameManager::initalise(CInput* input)
 
 	level1.LoadFromCSV("Resources/Levels/SpearGameLevel1.csv", &camera, program);
 
-	player.initalise(GameInput, &camera, 100, 100, 0, 300, program, texture1, 0, texture);
+	player1.initalise(GameInput, &camera, 100, 100, 0, 300, program, texture1, 0, texture);
 	player2.initalise(GameInput, &camera, 100, 100, 0, 0, program, texture, 1, texture1);
+
+	victory.init("", "Resources/Fonts/arial.ttf", glm::vec2(), glm::vec3(), 1);
+	p1Health.init("P1 Health: ", "Resources/Fonts/arial.ttf", glm::vec2((-(int)Utils::SCR_WIDTH / 2) + 10, (-(int)Utils::SCR_HEIGHT / 2) + 20), glm::vec3(), 1);
+	p2Health.init("P2 Health: ", "Resources/Fonts/arial.ttf", glm::vec2(((int)Utils::SCR_WIDTH / 2) - 350, (-(int)Utils::SCR_HEIGHT / 2) + 20), glm::vec3(), 1);
+	p1Dash.init("P1 Dash: ", "Resources/Fonts/arial.ttf", glm::vec2((-(int)Utils::SCR_WIDTH / 2) + 10, (-(int)Utils::SCR_HEIGHT / 2) + 60), glm::vec3(), 1);
+	p2Dash.init("P2 Dash: ", "Resources/Fonts/arial.ttf", glm::vec2(((int)Utils::SCR_WIDTH / 2) - 350, (-(int)Utils::SCR_HEIGHT / 2) + 60), glm::vec3(), 1);
 }
 
 void CGameManager::update()
@@ -42,6 +48,18 @@ void CGameManager::update()
 		down = GameInput->checkKeyDownFirst(KEY, GLFW_KEY_DOWN);
 		confirm = GameInput->checkKeyDownFirst(KEY, GLFW_KEY_ENTER);
 
+		if (GameInput->isJoystickValid(0))
+		{
+			GLFWgamepadstate gpState = GameInput->getJoystickInput(0);
+			up = gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.5 && !axisLast;
+			down = gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.5 && !axisLast;
+
+			axisLast = gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.5 || gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.5;
+
+			confirm = gpState.buttons[GLFW_GAMEPAD_BUTTON_A] && !confirmLast;
+			confirmLast = gpState.buttons[GLFW_GAMEPAD_BUTTON_A];
+		}
+
 		if (confirm)
 		{
 			switch (state)
@@ -50,7 +68,15 @@ void CGameManager::update()
 			{
 				if (option == 0)
 				{
-					state = Game;
+					if (GameInput->isJoystickValid(0) && GameInput->isJoystickValid(1) || dev)
+					{
+						state = Game;
+						endgame = false;
+					}
+					else
+					{
+						std::cout << "Please connect 2 controllers" << std::endl;
+					}
 				}
 				else if (option == 1)
 				{
@@ -71,7 +97,16 @@ void CGameManager::update()
 
 			case 3:
 			{
-				state = MainMenu;
+				if (endgame)
+				{
+					player1.resetScore();
+					player2.resetScore();
+					state = MainMenu;
+				}
+				else
+				{
+					state = Game;
+				}
 			}
 			break;
 
@@ -133,14 +168,45 @@ void CGameManager::update()
 		float DT = deltaTime.count() > 0.1f ? 0.1f : deltaTime.count();
 		DT *= spdMultiplier;
 
-		player.update(DT, level1.GetTiles(), player2);
-		player2.update(DT, level1.GetTiles(), player);
+		player1.update(DT, level1.GetTiles(), player2);
+		player2.update(DT, level1.GetTiles(), player1);
 
-		if (player.getHealth() <= 0 || player2.getHealth() <= 0)
+		p1Health.SetText("P1 Health : " + std::to_string((int)player1.getHealth()));
+		p2Health.SetText("P2 Health : " + std::to_string((int)player2.getHealth()));
+		p1Dash.SetText("Dash : " + std::to_string(player1.isDashReady()));
+		p2Dash.SetText("Dash : " + std::to_string(player2.isDashReady()));
+
+		if (player1.getHealth() <= 0 || player2.getHealth() <= 0)
 		{
-			state = EndScreen;
-			player.reset();
+			if (player1.getHealth() <= 0)
+			{
+				player2.addPoint();
+			}
+			else
+			{
+				player1.addPoint();
+			}
+
+			if (player1.getScore() >= 2)
+			{
+				victory.SetText("Player 1 wins");
+				victory.SetPosition(glm::vec2(-160, 0));
+				endgame = true;
+			}
+			else if (player2.getScore() >= 2)
+			{
+				victory.SetText("Player 2 wins");
+				victory.SetPosition(glm::vec2(-160, 0));
+				endgame = true;
+			}
+			else
+			{
+				victory.SetText(std::to_string(player1.getScore()) + " : " + std::to_string(player2.getScore()));
+				victory.SetPosition(glm::vec2(-50, 0));
+			}
+			player1.reset();
 			player2.reset();
+			state = EndScreen;
 		}
 	}
 }
@@ -158,8 +224,12 @@ void CGameManager::render()
 	case Game:
 	{
 		level1.Render();
-		player.render();
+		player1.render();
 		player2.render();
+		p1Health.Render();
+		p2Health.Render();
+		p1Dash.Render();
+		p2Dash.Render();
 	}
 		break;
 	case HelpMenu:
@@ -170,6 +240,7 @@ void CGameManager::render()
 	case EndScreen:
 	{
 		EMenu1.render(glm::mat4());
+		victory.Render();
 	}
 		break;
 	default:
