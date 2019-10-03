@@ -23,10 +23,10 @@ void CGameManager::initalise(CInput* input)
 	player1.initalise(GameInput, &camera, 100, 50, 0, 300, program, TextureLoader::get("player1"), 0, TextureLoader::get("spear"));
 	player2.initalise(GameInput, &camera, 100, 50, 0, 0, program, TextureLoader::get("player2"), 1, TextureLoader::get("spear"));
 	victory.init("", "Resources/Fonts/arial.ttf", glm::vec2(), glm::vec3(), 1);
-	p1Health.init("P1 Health: ", "Resources/Fonts/arial.ttf", glm::vec2((-(int)Utils::SCR_WIDTH / 2) + 10, (-(int)Utils::SCR_HEIGHT / 2) + 20), glm::vec3(), 1);
-	p2Health.init("P2 Health: ", "Resources/Fonts/arial.ttf", glm::vec2(((int)Utils::SCR_WIDTH / 2) - 350, (-(int)Utils::SCR_HEIGHT / 2) + 20), glm::vec3(), 1);
-	p1Dash.init("P1 Dash: ", "Resources/Fonts/arial.ttf", glm::vec2((-(int)Utils::SCR_WIDTH / 2) + 10, (-(int)Utils::SCR_HEIGHT / 2) + 60), glm::vec3(), 1);
-	p2Dash.init("P2 Dash: ", "Resources/Fonts/arial.ttf", glm::vec2(((int)Utils::SCR_WIDTH / 2) - 350, (-(int)Utils::SCR_HEIGHT / 2) + 60), glm::vec3(), 1);
+	p1Health.init("P1 Health: ", "Resources/Fonts/arial.ttf", glm::vec2((-(int)Utils::SCR_WIDTH / 2) + 10, (-(int)Utils::SCR_HEIGHT / 2) + 20), glm::vec3(1,1,1), 1);
+	p2Health.init("P2 Health: ", "Resources/Fonts/arial.ttf", glm::vec2(((int)Utils::SCR_WIDTH / 2) - 350, (-(int)Utils::SCR_HEIGHT / 2) + 20), glm::vec3(1, 1, 1), 1);
+	p1Dash.init("P1 Dash: ", "Resources/Fonts/arial.ttf", glm::vec2((-(int)Utils::SCR_WIDTH / 2) + 10, (-(int)Utils::SCR_HEIGHT / 2) + 60), glm::vec3(1, 1, 1), 1);
+	p2Dash.init("P2 Dash: ", "Resources/Fonts/arial.ttf", glm::vec2(((int)Utils::SCR_WIDTH / 2) - 350, (-(int)Utils::SCR_HEIGHT / 2) + 60), glm::vec3(1, 1, 1), 1);
 
 }
 
@@ -92,6 +92,7 @@ void CGameManager::update()
 				}
 				else
 				{
+					loadLevel(level1);
 					state = Game;
 				}
 			}

@@ -62,8 +62,9 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 
 	if (dash && dashReady)
 	{
-		velocity.x += (velocity.x < 0) ? -dashSpeed : dashSpeed;
+		velocity.x += (horizontalSpeed < 0) ? -dashSpeed : dashSpeed;
 		dashReady = false;
+		dashCount = 0;
 	}
 	else if (!dashReady)
 	{

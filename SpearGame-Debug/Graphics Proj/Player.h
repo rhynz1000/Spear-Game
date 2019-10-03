@@ -45,7 +45,7 @@ private:
 	const float dashCooldown = 3.0f;
 	float dashCount = 0;
 	bool dashReady = true;
-	const float dashSpeed = 800.0f;
+	const float dashSpeed = 1200.0f;
 	float health = 100;
 	const float maxHealth = 100;
 	glm::vec2 spawnPoint;
