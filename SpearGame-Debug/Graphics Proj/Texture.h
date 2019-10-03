@@ -9,15 +9,16 @@
 
 // Library Includes
 #include <iostream>
+#include <filesystem>
 
 class TextureLoader
 {
-
 public:
 	TextureLoader(void);
 	~TextureLoader(void);
-	static GLuint CreateTexture(const char* TextureFilename);//crates a texture from a filename
-
+	static void Initialise(std::string textureFolder);
+	static GLuint get(std::string textureName);
 private:
-	//std::map<std::string, GLuint> textures;
+	static std::map<std::string, GLuint> textures;
+	static GLuint CreateTexture(const char* TextureFilename);//creates a texture from a filename
 };

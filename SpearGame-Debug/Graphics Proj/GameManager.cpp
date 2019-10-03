@@ -2,8 +2,6 @@
 
 GLuint program, program1;
 
-GLuint texture, texture1;
-
 void CGameManager::initalise(CInput* input)
 {
 	state = MainMenu;
@@ -12,23 +10,18 @@ void CGameManager::initalise(CInput* input)
 	program = ShaderLoader::CreateProgram("Resources/Shaders/Basic.ver", "Resources/Shaders/Basic.frag");
 	program1 = ShaderLoader::CreateProgram("Resources/Shaders/Basic.ver", "Resources/Shaders/Colour.frag");
 
-	texture = TextureLoader::CreateTexture("Resources/Textures/Rayman.jpg");
-	texture1 = TextureLoader::CreateTexture("Resources/Textures/AwesomeFace.png");
-
 	camera.orthoInti(Utils::SCR_WIDTH, Utils::SCR_HEIGHT, 0.1f, 100.0f);
 
-	MMenu1.Initalise(&camera, Utils::SCR_HEIGHT, Utils::SCR_WIDTH, 0, 0, program, TextureLoader::CreateTexture("Resources/Textures/MainMenu.png"));
+	MMenu1.Initalise(&camera, Utils::SCR_HEIGHT, Utils::SCR_WIDTH, 0, 0, program, TextureLoader::get("MainMenu"));
 
-	HMenu1.Initalise(&camera, Utils::SCR_HEIGHT, Utils::SCR_WIDTH, 0, 0, program, TextureLoader::CreateTexture("Resources/Textures/HelpMenu.png"));
+	HMenu1.Initalise(&camera, Utils::SCR_HEIGHT, Utils::SCR_WIDTH, 0, 0, program, TextureLoader::get("HelpMenu"));
 
-	EMenu1.Initalise(&camera, Utils::SCR_HEIGHT, Utils::SCR_WIDTH, 0, 0, program, TextureLoader::CreateTexture("Resources/Textures/EndMenu.png"));
+	EMenu1.Initalise(&camera, Utils::SCR_HEIGHT, Utils::SCR_WIDTH, 0, 0, program, TextureLoader::get("EndMenu"));
 
-	Selector.Initalise(&camera, 30, 50, -130, 0, program, TextureLoader::CreateTexture("Resources/Textures/Selector.png"));
-	
-	srand(time(NULL));
+	Selector.Initalise(&camera, 30, 50, -130, 0, program, TextureLoader::get("Selector"));
 
-	player.initalise(GameInput, &camera, 100, 100, 0, 300, program, texture1, 0, texture);
-	player2.initalise(GameInput, &camera, 100, 100, 0, 0, program, texture, 1, texture1);
+	player.initalise(GameInput, &camera, 100, 50, 0, 300, program, TextureLoader::get("player1"), 0, TextureLoader::get("spear"));
+	player2.initalise(GameInput, &camera, 100, 50, 0, 0, program, TextureLoader::get("player2"), 1, TextureLoader::get("spear"));
 }
 
 void CGameManager::update()
