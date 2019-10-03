@@ -1,6 +1,6 @@
 #include "TextLabel.h"
 
-TextLabel::TextLabel(std::string newText, std::string font, glm::vec2 pos, glm::vec3 colour, float scale)//creates a text object for the ui
+void TextLabel::init(std::string newText, std::string font, glm::vec2 pos, glm::vec3 colour, float scale)//creates a text object for the ui
 {
 	//set all needed variables
 	text = newText;

@@ -18,13 +18,15 @@ void CPlayer::initalise(CInput * input, CCamera* newCamera, float sizeH, float s
 
 void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &otherPlayer)
 {
-	bool up, down, left, right, shoot, punch;
+	bool up, left, right, shoot, punch, dash;
 
 	punch = gameInput->checkKeyDownFirst(KEY, GLFW_KEY_Q);
 	shoot = gameInput->checkKeyDownFirst(KEY, GLFW_KEY_E);
 	up = gameInput->checkKeyDownFirst(KEY, GLFW_KEY_SPACE);
 	left = gameInput->checkKeyDown(KEY, GLFW_KEY_A);
 	right = gameInput->checkKeyDown(KEY, GLFW_KEY_D);
+	dash = gameInput->checkKeyDown(KEY, GLFW_KEY_F);
+
 	float horizontalSpeed = (left && !right) || (right && !left) ? (right ? 1.0f : -1.0f) : 0.0f;
 	glm::vec2 spearDir = glm::vec2(0.5f, 0.5f);
 	
@@ -43,6 +45,9 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 		horizontalSpeed = gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
 		horizontalSpeed = (abs(horizontalSpeed) > 0.5f) ? horizontalSpeed : 0.0f;
 		spearDir = glm::normalize(glm::vec2(gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_X], -gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]));
+
+		dash = gpState.buttons[GLFW_GAMEPAD_BUTTON_X] && !dashLast;
+		dashLast = gpState.buttons[GLFW_GAMEPAD_BUTTON_X];
 	}
 
 	if (horizontalSpeed != 0.0f) {
@@ -53,6 +58,17 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 		else {
 			velocity.x = fminf(velocity.x, horizontalSpeed * speed);
 		}
+	}
+
+	if (dash && dashReady)
+	{
+		velocity.x += (velocity.x < 0) ? -dashSpeed : dashSpeed;
+		dashReady = false;
+	}
+	else if (!dashReady)
+	{
+		dashCount += deltaTime;
+		dashReady = (dashCount > dashCooldown);
 	}
 
 	if (up && !grounded)
@@ -68,6 +84,8 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 		velocity.y = 800.0f;
 		canDoubleJump = false;
 	}
+
+
 
 	if (!grounded) { velocity = velocity + glm::vec2(0.0f, -1500.0f * deltaTime); }
 
@@ -206,12 +224,6 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 			delete spear;
 			spear = 0;
 		}
-
-		if (otherPlayer.getSpear() != 0 && collider.collide(otherPlayer.getSpear()->getCollider()) && !otherPlayer.getSpear()->isInWall())
-		{
-			std::cout << "ow" << std::endl;
-			hit(100);
-		}
 	}
 
 	if (spearDir.x < 0)
@@ -225,8 +237,14 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 
 	if (punch && meleeRange.collide(otherPlayer.getCollider()))
 	{
-		std::cout << "hit" << std::endl;
+		//std::cout << "hit" << std::endl;
 		otherPlayer.hit(10);
+	}
+
+	if (otherPlayer.getSpear() != 0 && collider.collide(otherPlayer.getSpear()->getCollider()) && !otherPlayer.getSpear()->isInWall())
+	{
+		//std::cout << "ow" << std::endl;
+		hit(100);
 	}
 	
 }
@@ -240,15 +258,12 @@ void CPlayer::render()
 	}
 }
 
-void CPlayer::hit(float damage)
-{
-	health -= damage;
-}
-
 void CPlayer::reset()
 {
 	velocity = glm::vec2();
 	health = maxHealth;
+	grounded = false;
+	upLast = true;
 
 	translate(X, spawnPoint.x, false);
 	translate(Y, spawnPoint.y, false);

@@ -16,10 +16,14 @@ public:
 	void initalise(CInput* input, CCamera* newCamera, float sizeH, float sizeW, float initalX, float initalY, GLuint prog, GLuint playerTex, int joy, GLuint initSpearTex);
 	void update(float deltaTime, std::vector<CTile*> & level, CPlayer &otherPlayer);
 	void render();
-	void hit(float damage);
+	void hit(float damage) { health -= damage; }
 	void reset();
+	void resetScore() { score = 0; }
+	void addPoint() { score++; }
 
+	bool isDashReady() { return dashReady; }
 	float getHealth() { return health; }
+	int getScore() { return score; }
 	C2DCollider getCollider() { return collider; }
 	CSpear* getSpear() { return spear; }
 	CSpear* swapSpear(CSpear* spear);
@@ -36,8 +40,13 @@ private:
 	bool canDoubleJump = true;
 	int joystick = 0;
 	C2DCollider collider, meleeRange;
-	bool punchLast = false, shootLast = false, upLast = false;
+	bool punchLast = false, shootLast = false, upLast = true, dashLast = false;
+	const float dashCooldown = 3.0f;
+	float dashCount = 0;
+	bool dashReady = true;
+	const float dashSpeed = 800.0f;
 	float health = 100;
 	const float maxHealth = 100;
 	glm::vec2 spawnPoint;
+	int score = 0;
 };

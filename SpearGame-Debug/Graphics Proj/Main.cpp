@@ -53,7 +53,7 @@ int main(int argc, char **argv)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 
-	srand(time(0));
+	srand((int)time(0));
 
 	/*glDepthFunc(GL_LESS);
 	glEnable(GL_DEPTH_TEST);*/
@@ -118,6 +118,10 @@ void Update()
 	{
 		gameManager.spddown();
 	}
+	if (GameInput.checkKeyDownFirst(KEY, GLFW_KEY_GRAVE_ACCENT))
+	{
+		gameManager.devModeSwitch();
+	}
 
 	gameManager.update();
 
@@ -145,7 +149,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
-	GameInput.MouseMove((float)xpos, (float)ypos);
+	GameInput.MouseMove((int)xpos, (int)ypos);
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
