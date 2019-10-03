@@ -1,5 +1,7 @@
 #include "Audio.h"
 
+CAudio* CAudio::instance = nullptr;
+
 CAudio::CAudio(){}//constructor
 
 CAudio::~CAudio()//deconstuctor
@@ -12,7 +14,7 @@ CAudio::~CAudio()//deconstuctor
 	audioSystem = 0;
 }
 
-bool CAudio::initalise()//creates and initalises the audio sysytem
+bool CAudio::initalise(std::string soundFolder)//creates and initalises the audio sysytem
 {
 	FMOD_RESULT result;//result for error checking
 	result = FMOD::System_Create(&audioSystem);
@@ -20,6 +22,13 @@ bool CAudio::initalise()//creates and initalises the audio sysytem
 
 	result = audioSystem->init(100, FMOD_INIT_NORMAL | FMOD_INIT_3D_RIGHTHANDED, 0);
 	if (result != FMOD_OK) { return false; }
+
+	for (std::experimental::filesystem::directory_entry entry : std::experimental::filesystem::directory_iterator(soundFolder)) {
+		std::vector<std::string> validExtensions = { ".mp3",".wav", ".ogg" };
+		if (std::find(validExtensions.begin(), validExtensions.end(), entry.path().extension()) != validExtensions.end()) {
+			loadSound(entry.path().string(), entry.path().stem().string(), false);
+		}
+	}
 
 	return true;
 }
@@ -49,4 +58,10 @@ bool CAudio::playSound(std::string name, float volume)//plays a sound
 	if (result != FMOD_OK) { return false; }
 	channel->setVolume(volume);//sets volume
 	return true;
+}
+
+CAudio* CAudio::getInstance()
+{
+	if (instance == nullptr) instance = new CAudio();
+	return instance;
 }

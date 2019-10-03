@@ -2,8 +2,6 @@
 
 GLuint program, program1;
 
-GLuint texture, texture1;
-
 void CGameManager::initalise(CInput* input)
 {
 	state = MainMenu;
@@ -12,29 +10,24 @@ void CGameManager::initalise(CInput* input)
 	program = ShaderLoader::CreateProgram("Resources/Shaders/Basic.ver", "Resources/Shaders/Basic.frag");
 	program1 = ShaderLoader::CreateProgram("Resources/Shaders/Basic.ver", "Resources/Shaders/Colour.frag");
 
-	texture = TextureLoader::CreateTexture("Resources/Textures/Rayman.jpg");
-	texture1 = TextureLoader::CreateTexture("Resources/Textures/AwesomeFace.png");
-
 	camera.orthoInti(Utils::SCR_WIDTH, Utils::SCR_HEIGHT, 0.1f, 100.0f);
 
-	MMenu1.Initalise(&camera, Utils::SCR_HEIGHT, Utils::SCR_WIDTH, 0, 0, program, TextureLoader::CreateTexture("Resources/Textures/MainMenu.png"));
+	MMenu1.Initalise(&camera, Utils::SCR_HEIGHT, Utils::SCR_WIDTH, 0, 0, program, TextureLoader::get("MainMenu"));
 
-	HMenu1.Initalise(&camera, Utils::SCR_HEIGHT, Utils::SCR_WIDTH, 0, 0, program, TextureLoader::CreateTexture("Resources/Textures/HelpMenu.png"));
+	HMenu1.Initalise(&camera, Utils::SCR_HEIGHT, Utils::SCR_WIDTH, 0, 0, program, TextureLoader::get("HelpMenu"));
 
-	EMenu1.Initalise(&camera, Utils::SCR_HEIGHT, Utils::SCR_WIDTH, 0, 0, program, TextureLoader::CreateTexture("Resources/Textures/EndMenu.png"));
+	EMenu1.Initalise(&camera, Utils::SCR_HEIGHT, Utils::SCR_WIDTH, 0, 0, program, TextureLoader::get("EndMenu"));
 
-	Selector.Initalise(&camera, 30, 50, -130, 0, program, TextureLoader::CreateTexture("Resources/Textures/Selector.png"));
-	
-	srand(time(NULL));
+	Selector.Initalise(&camera, 30, 50, -130, 0, program, TextureLoader::get("Selector"));
 
-	player.initalise(GameInput, &camera, 100, 100, 0, 300, program, texture1, 0, texture);
-	player2.initalise(GameInput, &camera, 100, 100, 0, 0, program, texture, 1, texture1);
-
+	player.initalise(GameInput, &camera, 100, 50, 0, 300, program, TextureLoader::get("player1"), 0, TextureLoader::get("spear"));
+	player2.initalise(GameInput, &camera, 100, 50, 0, 0, program, TextureLoader::get("player2"), 1, TextureLoader::get("spear"));
 	victory.init("", "Resources/Fonts/arial.ttf", glm::vec2(), glm::vec3(), 1);
 	p1Health.init("P1 Health: ", "Resources/Fonts/arial.ttf", glm::vec2((-(int)Utils::SCR_WIDTH / 2) + 10, (-(int)Utils::SCR_HEIGHT / 2) + 20), glm::vec3(), 1);
 	p2Health.init("P2 Health: ", "Resources/Fonts/arial.ttf", glm::vec2(((int)Utils::SCR_WIDTH / 2) - 350, (-(int)Utils::SCR_HEIGHT / 2) + 20), glm::vec3(), 1);
 	p1Dash.init("P1 Dash: ", "Resources/Fonts/arial.ttf", glm::vec2((-(int)Utils::SCR_WIDTH / 2) + 10, (-(int)Utils::SCR_HEIGHT / 2) + 60), glm::vec3(), 1);
 	p2Dash.init("P2 Dash: ", "Resources/Fonts/arial.ttf", glm::vec2(((int)Utils::SCR_WIDTH / 2) - 350, (-(int)Utils::SCR_HEIGHT / 2) + 60), glm::vec3(), 1);
+
 }
 
 void CGameManager::update()
@@ -62,6 +55,7 @@ void CGameManager::update()
 
 		if (confirm)
 		{
+			CAudio::getInstance()->playSound("Select", 0.3);
 			switch (state)
 			{
 			case 0:
@@ -111,13 +105,14 @@ void CGameManager::update()
 		}
 		if (state == MainMenu)
 		{
-
 			if (up)
 			{
+				CAudio::getInstance()->playSound("MouseOver", 0.3);
 				option = option - 1;
 			}
 			else if (down)
 			{
+				CAudio::getInstance()->playSound("MouseOver", 0.3);
 				option = option + 1;
 			}
 
@@ -171,6 +166,7 @@ void CGameManager::update()
 
 		if (player1.getHealth() <= 0 || player2.getHealth() <= 0)
 		{
+			CAudio::getInstance()->playSound("Death", 0.3);
 			if (player1.getHealth() <= 0)
 			{
 				player2.addPoint();
@@ -197,8 +193,6 @@ void CGameManager::update()
 				victory.SetText(std::to_string(player1.getScore()) + " : " + std::to_string(player2.getScore()));
 				victory.SetPosition(glm::vec2(-50, 0));
 			}
-			player1.reset();
-			player2.reset();
 			state = EndScreen;
 		}
 	}

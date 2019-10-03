@@ -6,6 +6,7 @@
 #include "Spear.h"
 #include "CCollider.h"
 #include "CTile.h"
+#include "Audio.h"
 
 class CPlayer : public CQuad
 {

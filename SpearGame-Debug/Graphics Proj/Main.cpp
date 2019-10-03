@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetCursorPosCallback(window, cursor_position_callback);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
-
+	
 	glfwMakeContextCurrent(window);
 
 	glfwSwapInterval(1);
@@ -71,6 +71,8 @@ int main(int argc, char **argv)
 	//sets clear colour when calling glClear()
 	glClearColor(1.0, 0.0, 1.0, 1.0);
 
+	TextureLoader::Initialise("Resources/Textures");
+	CAudio::getInstance()->initalise("Resources/Sounds");
 	gameManager.initalise(&GameInput);
 
 	while (!glfwWindowShouldClose(window))
