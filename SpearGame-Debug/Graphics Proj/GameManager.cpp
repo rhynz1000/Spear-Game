@@ -16,14 +16,12 @@ void CGameManager::initalise(CInput* input)
 
 	HMenu1.Initalise(&camera, Utils::SCR_HEIGHT, Utils::SCR_WIDTH, 0, 0, program, TextureLoader::get("HelpMenu"));
 
-	EMenu1.Initalise(&camera, Utils::SCR_HEIGHT, Utils::SCR_WIDTH, 0, 0, program, TextureLoader::get("EndMenu.png"));
+	EMenu1.Initalise(&camera, Utils::SCR_HEIGHT, Utils::SCR_WIDTH, 0, 0, program, TextureLoader::get("EndMenu"));
 
 	Selector.Initalise(&camera, 30, 50, -130, 0, program, TextureLoader::get("Selector"));
-	
-	srand(time(NULL));
 
-	player.initalise(GameInput, &camera, 100, 100, 0, 300, program, TextureLoader::get("player1"), 0, TextureLoader::get("spear"));
-	player2.initalise(GameInput, &camera, 100, 100, 0, 0, program, TextureLoader::get("player2"), 1, TextureLoader::get("spear"));
+	player.initalise(GameInput, &camera, 100, 50, 0, 300, program, TextureLoader::get("player1"), 0, TextureLoader::get("spear"));
+	player2.initalise(GameInput, &camera, 100, 50, 0, 0, program, TextureLoader::get("player2"), 1, TextureLoader::get("spear"));
 }
 
 void CGameManager::update()
@@ -175,7 +173,6 @@ void CGameManager::render()
 
 void CGameManager::loadLevel(CLevel & level)
 {
-	srand(time(NULL));
 	std::vector<std::string> levelPaths;
 	for (std::experimental::filesystem::directory_entry entry : std::experimental::filesystem::directory_iterator("Resources/Levels")) {
 		if (entry.path().extension() == ".csv") {
