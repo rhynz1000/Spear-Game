@@ -10,5 +10,6 @@ public:
 	std::vector<CTile*>& GetTiles();
 private:
 	std::vector<CTile*> tileArray;
+	CQuad* background;
 };
 

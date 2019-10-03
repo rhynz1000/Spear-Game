@@ -4,6 +4,7 @@
 
 CLevel::CLevel()
 {
+	background = new CQuad();
 }
 
 
@@ -16,13 +17,15 @@ CLevel::~CLevel()
 
 void CLevel::LoadFromCSV(std::string filePath, CCamera * camera, GLuint prog)
 {
+	background->Initalise(camera, Utils::SCR_HEIGHT, Utils::SCR_WIDTH, 0.0f, 0.0f, prog, TextureLoader::get("background"));
+
 	std::vector<CTile*>::iterator itr = tileArray.begin();
 	while (tileArray.size() > 0) {
 		delete* itr;
 		itr = tileArray.erase(itr);
 	}
 	const float size = 60.0f;
-	GLuint tex = TextureLoader::CreateTexture("Resources/Textures/Rayman.jpg");
+	GLuint tex = TextureLoader::get("ground");
 	std::ifstream file;
 	file.open(filePath);
 	if (!file.good()) return;
@@ -34,7 +37,14 @@ void CLevel::LoadFromCSV(std::string filePath, CCamera * camera, GLuint prog)
 			if (item == ',') continue;
 			if (item == '1') {
 				CTile* temp = new CTile();
-				temp->Initalise(camera, size, size, -(x * size + size / 2.0f - Utils::SCR_WIDTH / 2.0f), -(y * size + size / 2.0f - Utils::SCR_HEIGHT / 2.0f), prog, tex);
+				bool underground = false;
+				for (CTile* tile : tileArray) {
+					if (tile->getPos().x == -(x * size + size / 2.0f - Utils::SCR_WIDTH / 2.0f) && tile->getPos().y == -((y-1) * size + size / 2.0f - Utils::SCR_HEIGHT / 2.0f)) {
+						underground = true;
+						break;
+					}
+				}
+				temp->Initalise(camera, size, size, -(x * size + size / 2.0f - Utils::SCR_WIDTH / 2.0f), -(y * size + size / 2.0f - Utils::SCR_HEIGHT / 2.0f), prog, underground ? TextureLoader::get("ground_mid") : TextureLoader::get("ground"));
 				tileArray.push_back(temp);
 			}
 			x++;
@@ -47,6 +57,7 @@ void CLevel::LoadFromCSV(std::string filePath, CCamera * camera, GLuint prog)
 
 void CLevel::Render()
 {
+	background->render(glm::mat4());
 	for (CTile *tile : tileArray) {
 		tile->render(glm::mat4());
 	}

@@ -4,17 +4,10 @@
 TextureLoader::TextureLoader(void){}
 TextureLoader::~TextureLoader(void){}
 
-std::map<const char*, GLuint> Textures;//map of prevously created textures
+std::map<std::string, GLuint> TextureLoader::textures = std::map<std::string, GLuint>();//map of prevously created textures
 
 GLuint TextureLoader::CreateTexture(const char * TextureFilename)//makes a texture based on filename
 {
-	
-	auto it = Textures.find(TextureFilename);
-
-	if (it != Textures.end())
-	{
-		return (*it).second;
-	}
 
 	GLuint texture;
 
@@ -35,7 +28,21 @@ GLuint TextureLoader::CreateTexture(const char * TextureFilename)//makes a textu
 	SOIL_free_image_data(image);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	Textures[TextureFilename] = texture;
-
 	return texture;
+}
+
+void TextureLoader::Initialise(std::string textureFolder)
+{
+	for (std::experimental::filesystem::directory_entry entry : std::experimental::filesystem::directory_iterator(textureFolder)) {
+		std::vector<std::string> validExtensions = { ".jpg",".png", ".bmp" };
+		if (std::find(validExtensions.begin(), validExtensions.end(), entry.path().extension()) != validExtensions.end()) {
+			textures[entry.path().stem().string()] = TextureLoader::CreateTexture(entry.path().string().c_str());
+		}
+	}
+
+}
+
+GLuint TextureLoader::get(std::string textureName)
+{
+	return textures.find(textureName) != textures.end() ? textures[textureName] : 0;
 }
