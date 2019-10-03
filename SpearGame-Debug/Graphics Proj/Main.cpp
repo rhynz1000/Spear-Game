@@ -72,6 +72,7 @@ int main(int argc, char **argv)
 	glClearColor(1.0, 0.0, 1.0, 1.0);
 
 	TextureLoader::Initialise("Resources/Textures");
+	CAudio::getInstance()->initalise("Resources/Sounds");
 	gameManager.initalise(&GameInput);
 
 	while (!glfwWindowShouldClose(window))

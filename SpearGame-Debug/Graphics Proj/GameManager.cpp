@@ -37,6 +37,7 @@ void CGameManager::update()
 
 		if (confirm)
 		{
+			CAudio::getInstance()->playSound("Select", 0.3);
 			switch (state)
 			{
 			case 0:
@@ -77,13 +78,14 @@ void CGameManager::update()
 		}
 		if (state == MainMenu)
 		{
-
 			if (up)
 			{
+				CAudio::getInstance()->playSound("MouseOver", 0.3);
 				option = option - 1;
 			}
 			else if (down)
 			{
+				CAudio::getInstance()->playSound("MouseOver", 0.3);
 				option = option + 1;
 			}
 
@@ -132,6 +134,7 @@ void CGameManager::update()
 
 		if (player.getHealth() <= 0 || player2.getHealth() <= 0)
 		{
+			CAudio::getInstance()->playSound("Death", 0.3);
 			state = EndScreen;
 			player.reset();
 			player2.reset();
