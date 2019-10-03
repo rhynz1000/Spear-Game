@@ -55,15 +55,22 @@ void CGameManager::update()
 
 		if (confirm)
 		{
-			CAudio::getInstance()->playSound("Select", 0.3);
+			CAudio::getInstance()->playSound("Select", 0.3f);
 			switch (state)
 			{
 			case 0:
 			{
 				if (option == 0)
 				{
-					loadLevel(level1);
-					state = Game;
+					if ((GameInput->isJoystickValid(0)) || dev)
+					{
+						loadLevel(level1);
+						state = Game;
+					}
+					else
+					{
+						std::cout << "No Controller Connected" << std::endl;
+					}
 				}
 				else if (option == 1)
 				{
@@ -108,12 +115,12 @@ void CGameManager::update()
 		{
 			if (up)
 			{
-				CAudio::getInstance()->playSound("MouseOver", 0.3);
+				CAudio::getInstance()->playSound("MouseOver", 0.3f);
 				option = option - 1;
 			}
 			else if (down)
 			{
-				CAudio::getInstance()->playSound("MouseOver", 0.3);
+				CAudio::getInstance()->playSound("MouseOver", 0.3f);
 				option = option + 1;
 			}
 
@@ -167,7 +174,7 @@ void CGameManager::update()
 
 		if (player1.getHealth() <= 0 || player2.getHealth() <= 0)
 		{
-			CAudio::getInstance()->playSound("Death", 0.3);
+			CAudio::getInstance()->playSound("Death", 0.3f);
 			if (player1.getHealth() <= 0)
 			{
 				player2.addPoint();

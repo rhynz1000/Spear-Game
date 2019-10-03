@@ -78,12 +78,12 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 	}
 
 	if (up && grounded ) {
-		CAudio::getInstance()->playSound("Jump", 0.3);
+		CAudio::getInstance()->playSound("Jump", 0.3f);
 		velocity.y = 800.0f;
 		canDoubleJump = true;
 	}
 	else if(up && canDoubleJump && velocity.y < 400.0f) {
-		CAudio::getInstance()->playSound("Jump", 0.3);
+		CAudio::getInstance()->playSound("Jump", 0.3f);
 		velocity.y = 800.0f;
 		canDoubleJump = false;
 	}
@@ -184,7 +184,7 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 	if (shoot && spear == 0)
 	{
 
-		CAudio::getInstance()->playSound("Throw", 0.3);
+		CAudio::getInstance()->playSound("Throw", 0.3f);
 		spear = new CSpear(spearDir*spearSpd + velocity);
 		spear->Initalise(camera, 30,60, getPos().x, getPos().y, spearProg, spearTex);
 	}
@@ -197,7 +197,7 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 
 		for (CTile *tile : level) {
 			if (!spear->isInWall() && spear->getCollider().collide(tile->GetCollider())) {
-				CAudio::getInstance()->playSound("SpearLand", 0.3);
+				CAudio::getInstance()->playSound("SpearLand", 0.3f);
 				spear->setInWall(true);
 				break;
 			}
