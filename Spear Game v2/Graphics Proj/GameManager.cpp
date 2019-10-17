@@ -27,7 +27,12 @@ void CGameManager::initalise(CInput* input)
 
 	EMenu1.Initalise(&camera, B2_HEIGHT, B2_WIDTH, 0, 0, program, TextureLoader::get("EndMenu"));
 
+	LMenu1.Initalise(&camera, B2_HEIGHT, B2_WIDTH, 0, 0, program, TextureLoader::get("LobbyMenu"));
+
 	Selector.Initalise(&camera, 30/PPM, 50/PPM, -130/PPM, 0, program, TextureLoader::get("Selector"));
+
+	P1Cont.Initalise(&camera, 30 / PPM, 50 / PPM, -130 / PPM, 0, program, TextureLoader::get("Controller"));
+	P2Cont.Initalise(&camera, 30 / PPM, 50 / PPM, -130 / PPM, 0, program, TextureLoader::get("Controller"));
 
 	player1.initalise(GameInput, &camera, 100/PPM, 50 / PPM, 0, 300 / PPM, program, TextureLoader::get("player1"), 0, TextureLoader::get("spear"));
 	player2.initalise(GameInput, &camera, 100 / PPM, 50 / PPM, 0, 0, program, TextureLoader::get("player2"), 1, TextureLoader::get("spear"));
@@ -272,6 +277,19 @@ void CGameManager::render()
 	{
 		EMenu1.render(glm::mat4());
 		victory.Render();
+	}
+		break;
+	case Lobby:
+	{
+		LMenu1.render(glm::mat4());
+		if (P1 == 1)
+		{
+			P1Cont.render(glm::mat4());
+		}
+		if (P2 == 1)
+		{
+			P2Cont.render(glm::mat4());
+		}
 	}
 		break;
 	default:

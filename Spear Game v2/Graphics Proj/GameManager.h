@@ -17,6 +17,7 @@ enum GameState
 	Game,
 	HelpMenu,
 	EndScreen,
+	Lobby,
 };
 
 class CGameManager : b2ContactListener
@@ -45,7 +46,10 @@ private:
 	CQuad MMenu1;
 	CQuad HMenu1;
 	CQuad EMenu1;
+	CQuad LMenu1;
 	CQuad Selector;
+	CQuad P1Cont;
+	CQuad P2Cont;
 
 	float spdMultiplier = 1;
 
