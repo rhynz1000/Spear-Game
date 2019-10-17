@@ -151,6 +151,7 @@ void CGameManager::update()
 					std::cout << "Not enough players." << std::endl;
 				}
 			}
+			break;
 
 			default:
 				break;
