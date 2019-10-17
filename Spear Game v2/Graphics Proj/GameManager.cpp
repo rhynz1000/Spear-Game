@@ -134,7 +134,7 @@ void CGameManager::update()
 
 			case Lobby:
 			{
-				if (P1Connected == 1 && P2Connected == 1)
+				if ((P1Connected == 1 && P2Connected == 1) || dev)
 				{
 					loadLevel(level1);
 					state = Game;
