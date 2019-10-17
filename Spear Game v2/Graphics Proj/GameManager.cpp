@@ -82,7 +82,7 @@ void CGameManager::update()
 			CAudio::getInstance()->playSound("Select", 0.3f);
 			switch (state)
 			{
-			case 0:
+			case MainMenu:
 			{
 				if (option == 0)
 				{
@@ -109,13 +109,13 @@ void CGameManager::update()
 			}
 			break;
 
-			case 2:
+			case HelpMenu:
 			{
 				state = MainMenu;
 			}
 			break;
 
-			case 3:
+			case EndScreen:
 			{
 				if (endgame)
 				{
@@ -132,17 +132,8 @@ void CGameManager::update()
 			}
 			break;
 
-			case 4:
+			case Lobby:
 			{
-				if ((GameInput->isJoystickValid(0)) && confirm)
-				{
-					P1Connected = 1;
-				}
-				if ((GameInput->isJoystickValid(1)) && confirm)
-				{
-					P2Connected = 1;
-				}
-
 				if (P1Connected == 1 && P2Connected == 1)
 				{
 					loadLevel(level1);
@@ -153,7 +144,6 @@ void CGameManager::update()
 					std::cout << "Not enough players." << std::endl;
 				}
 			}
-			break;
 
 			default:
 				break;
@@ -206,6 +196,7 @@ void CGameManager::update()
 
 		}
 	}
+	
 	else
 	{
 		deltaTime = std::chrono::high_resolution_clock::now() - previousTime;
@@ -279,6 +270,29 @@ void CGameManager::update()
 		}
 		/*testPlay.update();*/
 	}
+
+	if (state == Lobby)
+	{
+		if ((GameInput->isJoystickValid(0)))
+		{
+			GLFWgamepadstate gpState = GameInput->getJoystickInput(0);
+			if (gpState.buttons[GLFW_GAMEPAD_BUTTON_A])
+			{
+				P1Connected = 1;
+			}
+		}
+
+		if ((GameInput->isJoystickValid(1)))
+		{
+			GLFWgamepadstate gp2State = GameInput->getJoystickInput(1);
+			if (gp2State.buttons[GLFW_GAMEPAD_BUTTON_A])
+			{
+				P2Connected = 1;
+			}
+		}
+
+	}
+
 	if (!(GameInput->isJoystickValid(0)))
 	{
 		P1Connected = 0;
@@ -287,6 +301,7 @@ void CGameManager::update()
 	{
 		P2Connected = 0;
 	}
+
 	CAudio::getInstance()->update();
 }
 
