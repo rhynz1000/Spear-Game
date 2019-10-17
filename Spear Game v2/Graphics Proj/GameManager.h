@@ -16,6 +16,7 @@ enum GameState
 	Game,
 	HelpMenu,
 	EndScreen,
+	Lobby,
 };
 
 class CGameManager : b2ContactListener
@@ -45,11 +46,16 @@ private:
 	CQuad MMenu1;
 	CQuad HMenu1;
 	CQuad EMenu1;
+	CQuad LMenu1;
 	CQuad Selector;
+	CQuad P1Cont;
+	CQuad P2Cont;
 
 	float spdMultiplier = 1;
 
 	int option;
+	int P1Connected;
+	int P2Connected;
 	GameState state;
 	bool axisLast = false;
 	bool confirmLast = false;

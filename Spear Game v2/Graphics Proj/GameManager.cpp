@@ -17,6 +17,8 @@ void CGameManager::initalise(CInput* input)
 
 	state = MainMenu;
 	option = 0;
+	P1Connected = 0;
+	P2Connected = 0;
 	GameInput = input;
 	program = ShaderLoader::CreateProgram("Resources/Shaders/Basic.ver", "Resources/Shaders/Basic.frag");
 	program1 = ShaderLoader::CreateProgram("Resources/Shaders/Basic.ver", "Resources/Shaders/Colour.frag");
@@ -27,7 +29,12 @@ void CGameManager::initalise(CInput* input)
 
 	EMenu1.Initalise(&camera, B2_HEIGHT, B2_WIDTH, 0, 0, program, TextureLoader::get("EndMenu"));
 
+	LMenu1.Initalise(&camera, B2_HEIGHT, B2_WIDTH, 0, 0, program, TextureLoader::get("LobbyMenu"));
+
 	Selector.Initalise(&camera, 30/PPM, 50/PPM, -130/PPM, 0, program, TextureLoader::get("Selector"));
+
+	P2Cont.Initalise(&camera, 300 / PPM, 500 / PPM, 400 / PPM, -20 / PPM, program, TextureLoader::get("Controller"));
+	P1Cont.Initalise(&camera, 300 / PPM, 500 / PPM, -400 / PPM, -20 / PPM, program, TextureLoader::get("Controller"));
 
 	player1.initalise(GameInput, &camera, 100/PPM, 50 / PPM, 0, 300 / PPM, program, TextureLoader::get("player1"), 0, TextureLoader::get("spear"), world);
 	player1.setId(1);
@@ -79,15 +86,17 @@ void CGameManager::update()
 			{
 				if (option == 0)
 				{
-					if ((GameInput->isJoystickValid(0)) || dev)
-					{
-						loadLevel(level1);
-						state = Game;
-					}
-					else
-					{
-						std::cout << "No Controller Connected" << std::endl;
-					}
+					//if ((GameInput->isJoystickValid(0)) || dev)
+					//{
+					//	loadLevel(level1);
+					//	state = Game;
+					//}
+					//else
+					//{
+					//	std::cout << "No Controller Connected" << std::endl;
+					//}
+
+					state = Lobby;
 				}
 				else if (option == 1)
 				{
@@ -119,6 +128,29 @@ void CGameManager::update()
 				{
 					loadLevel(level1);
 					state = Game;
+				}
+			}
+			break;
+
+			case 4:
+			{
+				if ((GameInput->isJoystickValid(0)) && confirm)
+				{
+					P1Connected = 1;
+				}
+				if ((GameInput->isJoystickValid(1)) && confirm)
+				{
+					P2Connected = 1;
+				}
+
+				if (P1Connected == 1 && P2Connected == 1)
+				{
+					loadLevel(level1);
+					state = Game;
+				}
+				else
+				{
+					std::cout << "Not enough players." << std::endl;
 				}
 			}
 			break;
@@ -247,6 +279,14 @@ void CGameManager::update()
 		}
 		/*testPlay.update();*/
 	}
+	if (!(GameInput->isJoystickValid(0)))
+	{
+		P1Connected = 0;
+	}
+	if (!(GameInput->isJoystickValid(1)))
+	{
+		P2Connected = 0;
+	}
 	CAudio::getInstance()->update();
 }
 
@@ -283,6 +323,19 @@ void CGameManager::render()
 	{
 		EMenu1.render(glm::mat4());
 		victory.Render();
+	}
+		break;
+	case Lobby:
+	{
+		LMenu1.render(glm::mat4());
+		if (P1Connected == 1)
+		{
+			P1Cont.render(glm::mat4());
+		}
+		if (P2Connected == 1)
+		{
+			P2Cont.render(glm::mat4());
+		}
 	}
 		break;
 	default:
