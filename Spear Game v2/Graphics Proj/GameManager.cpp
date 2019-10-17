@@ -132,16 +132,16 @@ void CGameManager::update()
 
 			case 4:
 			{
-				if ((GameInput->isJoystickValid(0)) || dev)
+				if ((GameInput->isJoystickValid(0)))
 				{
 					P1Connected = 1;
 				}
-				if ((GameInput->isJoystickValid(1)) || dev)
+				if ((GameInput->isJoystickValid(1)))
 				{
 					P2Connected = 1;
 				}
 
-				if (P1Connected == 1 || P2Connected == 2)
+				if (P1Connected == 1 && P2Connected == 2)
 				{
 					loadLevel(level1);
 					state = Game;
