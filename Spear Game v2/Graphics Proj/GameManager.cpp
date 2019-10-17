@@ -141,7 +141,7 @@ void CGameManager::update()
 					P2Connected = 1;
 				}
 
-				if (P1Connected == 1 && P2Connected == 2)
+				if (P1Connected == 1 && P2Connected == 1)
 				{
 					loadLevel(level1);
 					state = Game;
