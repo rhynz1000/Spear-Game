@@ -132,11 +132,11 @@ void CGameManager::update()
 
 			case 4:
 			{
-				if ((GameInput->isJoystickValid(0)))
+				if ((GameInput->isJoystickValid(0)) && confirm)
 				{
 					P1Connected = 1;
 				}
-				if ((GameInput->isJoystickValid(1)))
+				if ((GameInput->isJoystickValid(1)) && confirm)
 				{
 					P2Connected = 1;
 				}
