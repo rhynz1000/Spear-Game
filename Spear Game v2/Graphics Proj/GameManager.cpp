@@ -136,18 +136,9 @@ void CGameManager::update()
 				{
 					P1Connected = 1;
 				}
-				if (GameInput->isJoystickValid(0))
-				{
-					P1Connected = 0;
-				}
-
 				if ((GameInput->isJoystickValid(1)) && confirm)
 				{
 					P2Connected = 1;
-				}
-				if (GameInput->isJoystickValid(1))
-				{
-					P2Connected = 0;
 				}
 
 				if (P1Connected == 1 && P2Connected == 1)
@@ -275,6 +266,14 @@ void CGameManager::update()
 			phyTimeStep = 0;
 		}
 		/*testPlay.update();*/
+	}
+	if (!(GameInput->isJoystickValid(0)))
+	{
+		P1Connected = 0;
+	}
+	if (!(GameInput->isJoystickValid(1)))
+	{
+		P2Connected = 0;
 	}
 	CAudio::getInstance()->update();
 }
