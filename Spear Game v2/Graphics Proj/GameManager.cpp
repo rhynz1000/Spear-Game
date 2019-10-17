@@ -33,8 +33,8 @@ void CGameManager::initalise(CInput* input)
 
 	Selector.Initalise(&camera, 30/PPM, 50/PPM, -130/PPM, 0, program, TextureLoader::get("Selector"));
 
-	P1Cont.Initalise(&camera, 30 / PPM, 50 / PPM, -130 / PPM, 0, program, TextureLoader::get("Controller"));
-	P2Cont.Initalise(&camera, 30 / PPM, 50 / PPM, -130 / PPM, 0, program, TextureLoader::get("Controller"));
+	P1Cont.Initalise(&camera, 300 / PPM, 500 / PPM, -400 / PPM, -20 / PPM, program, TextureLoader::get("Controller"));
+	P2Cont.Initalise(&camera, 300 / PPM, 500 / PPM, 400 / PPM, -20 / PPM, program, TextureLoader::get("Controller"));
 
 	player1.initalise(GameInput, &camera, 100/PPM, 50 / PPM, 0, 300 / PPM, program, TextureLoader::get("player1"), 0, TextureLoader::get("spear"));
 	player2.initalise(GameInput, &camera, 100 / PPM, 50 / PPM, 0, 0, program, TextureLoader::get("player2"), 1, TextureLoader::get("spear"));
