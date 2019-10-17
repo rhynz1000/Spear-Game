@@ -9,7 +9,6 @@
 #include "TextLabel.h"
 #include "Player.h"
 #include "CLevel.h"
-#include "Masks.h"
 
 enum GameState
 {
@@ -34,6 +33,7 @@ public:
 	void loadLevel(CLevel & level);
 	void devModeSwitch() { dev = !dev; }
 
+	void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override;
 	//void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) override;
 
 private:
@@ -56,6 +56,9 @@ private:
 
 	bool dev = false;
 	bool endgame = false;
+
+	bool spearStuck = false;
+	b2WeldJointDef spearJoint;
 
 	std::chrono::duration<float> deltaTime;
 	std::chrono::time_point<std::chrono::high_resolution_clock> previousTime;

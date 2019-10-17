@@ -5,7 +5,7 @@ class CLevel
 public:
 	CLevel();
 	~CLevel();
-	void LoadFromCSV(std::string filePath, CCamera * camera, GLuint prog);
+	void LoadFromCSV(std::string filePath, CCamera * camera, GLuint prog, b2World* world);
 	void Render();
 	std::vector<CTile*>& GetTiles();
 private:

@@ -1,5 +1,0 @@
-#pragma once
-
-#define SPEAR_CATEGORY					0b10000000
-#define PLAYER_CATEGORY					0b01000000
-#define PLATFORM_CATEGORY				0b00100000

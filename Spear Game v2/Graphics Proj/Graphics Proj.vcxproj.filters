@@ -122,8 +122,5 @@
     <ClInclude Include="Spear.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Masks.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

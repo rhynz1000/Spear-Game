@@ -5,7 +5,7 @@ CQuad testPlat, testPlay;
 
 void CGameManager::initalise(CInput* input)
 {
-	camera.orthoInti(32, 18, 0.1f, 100.0f);
+	camera.orthoInti(B2_WIDTH, B2_HEIGHT, 0.1f, 100.0f);
 
 	b2Vec2 gravity(0.0f, -10.0f);
 
@@ -29,8 +29,10 @@ void CGameManager::initalise(CInput* input)
 
 	Selector.Initalise(&camera, 30/PPM, 50/PPM, -130/PPM, 0, program, TextureLoader::get("Selector"));
 
-	player1.initalise(GameInput, &camera, 100/PPM, 50 / PPM, 0, 300 / PPM, program, TextureLoader::get("player1"), 0, TextureLoader::get("spear"));
-	player2.initalise(GameInput, &camera, 100 / PPM, 50 / PPM, 0, 0, program, TextureLoader::get("player2"), 1, TextureLoader::get("spear"));
+	player1.initalise(GameInput, &camera, 100/PPM, 50 / PPM, 0, 300 / PPM, program, TextureLoader::get("player1"), 0, TextureLoader::get("spear"), world);
+	player1.setId(1);
+	player2.initalise(GameInput, &camera, 100 / PPM, 50 / PPM, 0, 0, program, TextureLoader::get("player2"), 1, TextureLoader::get("spear"), world);
+	player2.setId(2);
 
 	victory.init("", "Resources/Fonts/arial.ttf", glm::vec2(), glm::vec3(), 1);
 	p1Health.init("P1 Health: ", "Resources/Fonts/arial.ttf", glm::vec2((-(int)SCR_WIDTH / 2) + 10, (-(int)SCR_HEIGHT / 2) + 20), glm::vec3(1,1,1), 1);
@@ -230,9 +232,18 @@ void CGameManager::update()
 		//do physics calculations 60 times per second
 		if (phyTimeStep >= 1 / 60)
 		{
+			player1.setGrounded(false);
+			player2.setGrounded(false);
 			world->Step(phyTimeStep, 10, 8);
 			world->ClearForces();
 			phyTimeStep = 0;
+
+			if (spearStuck)
+			{
+				world->CreateJoint(&spearJoint);
+				spearStuck = false;
+			}
+
 		}
 		/*testPlay.update();*/
 	}
@@ -287,6 +298,33 @@ void CGameManager::loadLevel(CLevel & level)
 			levelPaths.push_back(entry.path().string());
 		}
 	}
-	level.LoadFromCSV(levelPaths[rand() % levelPaths.size()], &camera, program);
+	level.LoadFromCSV(levelPaths[rand() % levelPaths.size()], &camera, program, world);
 	levelPaths.clear();
+}
+
+void CGameManager::PreSolve(b2Contact * contact, const b2Manifold * oldManifold)
+{
+
+	if ((int)contact->GetFixtureA()->GetBody()->GetUserData() == 1 && (int)contact->GetFixtureB()->GetBody()->GetUserData() == 3)
+	{
+		if (contact->GetFixtureA()->GetAABB(0).lowerBound.y + 2.0f * b2_linearSlop > contact->GetFixtureB()->GetAABB(0).upperBound.y)
+		{
+			player1.setGrounded(true);
+		}
+	}
+	else if ((int)contact->GetFixtureA()->GetBody()->GetUserData() == 2 && (int)contact->GetFixtureB()->GetBody()->GetUserData() == 3)
+	{
+		if (contact->GetFixtureA()->GetAABB(0).lowerBound.y + 2.0f * b2_linearSlop> contact->GetFixtureB()->GetAABB(0).upperBound.y)
+		{
+			player2.setGrounded(true);
+		}
+	}
+	else if ((int)contact->GetFixtureA()->GetBody()->GetUserData() == 3 && (int)contact->GetFixtureB()->GetBody()->GetUserData() == 4)
+	{
+		spearStuck = true;
+		spearJoint.bodyA = contact->GetFixtureA()->GetBody();
+		spearJoint.bodyB = contact->GetFixtureB()->GetBody();
+		spearJoint.localAnchorA = contact->GetFixtureA()->GetBody()->GetLocalPoint(contact->GetFixtureB()->GetBody()->GetPosition());
+		//spearJoint.localAnchorB;
+	}
 }

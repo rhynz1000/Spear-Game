@@ -38,7 +38,7 @@ public:
 	glm::vec4 getColour() { return objColour; }
 
 	virtual void render(glm::mat4 anchor);//renders the shape
-	virtual void update();//update the sprite with the body
+	virtual void physicsUpdate();//update the sprite with the body
 
 	//bool collision(C2DShape* other);
 	//bool collision(std::vector<C2DShape*> other);
@@ -48,6 +48,9 @@ public:
 	void sleepSwitch();//makes the body sleep
 	void setId(int i) { id = i; body->SetUserData((void*)id); }//sets the id
 	int getId() { return id; }//get the id
+	void setWorld(b2World* newWorld) { world = newWorld; }
+	b2World* getWorld() { return world; }
+	void destroyBody() { if (world) { world->DestroyBody(body); body = 0; } }
 
 	b2Body* body = 0;//box2d pointer
 
@@ -72,4 +75,6 @@ private:
 	GLuint IndiceCount;//number of indices
 
 	int id = 0;
+
+	b2World* world = 0;
 };

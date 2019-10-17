@@ -2,7 +2,7 @@
 
 C2DShape::C2DShape(){}
 
-C2DShape::~C2DShape(){ body = 0; }
+C2DShape::~C2DShape(){}
 
 void C2DShape::Initalise(CCamera * newCamera, float sizeH, float sizeW, float initalX, float initalY, GLuint prog, GLuint tex, GLfloat* vertices, GLuint* indices, int verticeSize, int indicesSize)
 {
@@ -17,7 +17,6 @@ void C2DShape::Initalise(CCamera * newCamera, float sizeH, float sizeW, float in
 	this->scale(Y, sizeH);
 	this->translate(X, initalX, false);
 	this->translate(Y, initalY, false);
-
 
 	//create ebo, vbo and vao
 	GLuint EBO, VBO;
@@ -142,7 +141,7 @@ void C2DShape::render(glm::mat4 anchor)
 }
 
 //update the sprite with the body pos and rotation
-void C2DShape::update()
+void C2DShape::physicsUpdate()
 {
 	if (body != 0)
 	{

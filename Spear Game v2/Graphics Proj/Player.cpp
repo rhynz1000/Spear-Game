@@ -1,17 +1,16 @@
 #include "Player.h"
 
-void CPlayer::initalise(CInput * input, CCamera* newCamera, float sizeH, float sizeW, float initalX, float initalY, GLuint prog, GLuint playerTex, int joy, GLuint initSpearTex)
+void CPlayer::initalise(CInput * input, CCamera* newCamera, float sizeH, float sizeW, float initalX, float initalY, GLuint prog, GLuint playerTex, int joy, GLuint initSpearTex, b2World* world)
 {
-	CQuad::Initalise(newCamera, sizeH, sizeW, initalX, initalY, prog, playerTex);
+	CQuad::Initalise(newCamera, sizeH, sizeW, initalX, initalY, prog, playerTex, world, b2_dynamicBody, PLAYER_CATEGORY, PLATFORM_CATEGORY|SPEAR_CATEGORY);
+
+	body->SetFixedRotation(true);
 
 	spearProg = prog;
 	spearTex = initSpearTex;
 	gameInput = input;
 	camera = newCamera;
 	joystick = joy;
-
-	collider.initalise(-0.5, 0.5, 0.5, -0.5, this);
-	meleeRange.initalise(0.0f, 1.0f, 0.5f, 0.5f, this);
 
 	spawnPoint = glm::vec2(initalX, initalY);
 }
@@ -50,19 +49,24 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 		dashLast = gpState.buttons[GLFW_GAMEPAD_BUTTON_X];
 	}
 
-	if (horizontalSpeed != 0.0f) {
-		velocity = glm::vec2(velocity.x + horizontalSpeed * deltaTime * speed * (grounded ? 5.0f : 1.0f), velocity.y);
-		if (velocity.x < 0) {
-			velocity.x = fmaxf(velocity.x, horizontalSpeed * speed);
-		}
-		else {
-			velocity.x = fminf(velocity.x, horizontalSpeed * speed);
-		}
+
+	body->ApplyForceToCenter(b2Vec2(horizontalSpeed *deltaTime * speed* (grounded ? 5.0f : 1.0f), 0), true);
+
+	if (up && grounded)
+	{
+		CAudio::getInstance()->playSound("Jump", 0.3f);
+		body->ApplyLinearImpulseToCenter(b2Vec2(0, jumpForce * deltaTime), true);
+		canDoubleJump = true;
+	}
+	else if (up && canDoubleJump) {
+		CAudio::getInstance()->playSound("Jump", 0.3f);
+		body->ApplyLinearImpulseToCenter(b2Vec2(0, jumpForce * deltaTime), true);
+		canDoubleJump = false;
 	}
 
 	if (dash && dashReady)
 	{
-		velocity.x += (horizontalSpeed < 0) ? -dashSpeed : dashSpeed;
+		body->ApplyLinearImpulseToCenter(b2Vec2(((horizontalSpeed < 0) ? -dashSpeed : dashSpeed)*deltaTime , 0), true);
 		dashReady = false;
 		dashCount = 0;
 	}
@@ -72,187 +76,114 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 		dashReady = (dashCount > dashCooldown);
 	}
 
-	if (up && !grounded)
-	{
-		//std::cout << "jump no ground: " << velocity.x << ", "<< velocity.y << std::endl;
+	while (body->GetPosition().x < -0.5f * static_cast<float>(B2_WIDTH)) {
+		body->SetTransform(b2Vec2(body->GetPosition().x + B2_WIDTH,body->GetPosition().y), 0);
+	}
+	while (body->GetPosition().x > 0.5f * static_cast<float>(B2_WIDTH)) {
+		body->SetTransform(b2Vec2(body->GetPosition().x - B2_WIDTH, body->GetPosition().y), 0);
 	}
 
-	if (up && grounded ) {
-		CAudio::getInstance()->playSound("Jump", 0.3f);
-		velocity.y = 800.0f;
-		canDoubleJump = true;
-	}
-	else if(up && canDoubleJump && velocity.y < 400.0f) {
-		CAudio::getInstance()->playSound("Jump", 0.3f);
-		velocity.y = 800.0f;
-		canDoubleJump = false;
+	while (body->GetPosition().y < -0.5f * static_cast<float>(B2_HEIGHT)) {
+		body->SetTransform(b2Vec2(body->GetPosition().x, body->GetPosition().y + B2_HEIGHT), 0);
 	}
 
-
-
-	if (!grounded) { velocity = velocity + glm::vec2(0.0f, -1500.0f * deltaTime); }
-
-	while (getPos().x < -0.5f * static_cast<float>(SCR_WIDTH)) {
-		translate(X, static_cast<float>(SCR_WIDTH), true);
-	}
-	while (getPos().x > 0.5f * static_cast<float>(SCR_WIDTH)) {
-		translate(X, -static_cast<float>(SCR_WIDTH), true);
+	while (body->GetPosition().y > 0.5f * static_cast<float>(B2_HEIGHT)) {
+		body->SetTransform(b2Vec2(body->GetPosition().x, body->GetPosition().y - B2_HEIGHT), 0);
 	}
 
-	while (getPos().y > 0.5f * static_cast<float>(SCR_HEIGHT)) {
-		translate(Y, -static_cast<float>(SCR_HEIGHT), true);
-	}
+	
 
-	while (getPos().y < -0.5f * static_cast<float>(SCR_HEIGHT)) {
-		translate(Y, static_cast<float>(SCR_HEIGHT), true);
-	}
-
-	float hFriction = grounded ? 4.0f : 0.1f;
-	float vFriction = 1.0f;
-
-	float hRatio = 1.0f / (1 + deltaTime * hFriction);
-	float vRatio = 1.0f / (1 + deltaTime * vFriction);
-
-	velocity.x *= hRatio;
-	velocity.y *= vRatio;
-
-	if (velocity != glm::vec2(0.0f, 0.0f))
-	{
-		bool coll = false;
-		grounded = false;
-
-		translate(X, velocity.x * deltaTime, true);
-		translate(Y, velocity.y * deltaTime, true);
-
-		for (CTile *tile : level) {
-			if (collider.collide(tile->GetCollider())) {
-				translate(X, -velocity.x * deltaTime, true);
-				translate(Y, -velocity.y * deltaTime, true);
-				coll = true;
-				break;
-			}
-		}
-
-		float moveMax = velocity.length() * deltaTime;
-		float moveCount = 0.0f;
-		glm::vec2 step = velocity * deltaTime;
-		if (moveMax > 1.0f) {
-			step = glm::normalize(velocity);
-		}
-
-
-		while (moveCount < moveMax && coll) {
-			bool breaking = false;
-			translate(Y, step.y, true);
-
-			for (CTile *tile : level) {
-				if (collider.collide(tile->GetCollider())) {
-					translate(Y, -step.y, true);
-					breaking = true;
-					if (velocity.y > 0.0f) {
-						velocity.y = 0.0f;
-					}
-					else if (velocity.y <= 0.0f) {
-						velocity.y = 0.0f;
-						grounded = true;
-					}
-				}
-			}
-			if (breaking) break;
-			moveCount += fmin(moveMax + 0.01f, 1.0f);
-		}
-
-		moveCount = 0;
-
-		while (moveCount < moveMax && coll) {
-			bool breaking = false;
-			translate(X, step.x, true);
-
-			for (CTile *tile : level) {
-				if (collider.collide(tile->GetCollider())) {
-					translate(X, -step.x, true);
-					breaking = true;
-					velocity.x = 0.0f;
-				}
-			}
-			if (breaking) break;
-			moveCount += fmin(moveMax + 0.01f, 1.0f);
-		}	
-		
-	}
-
+	
 	if (shoot && spear == 0)
 	{
-
 		CAudio::getInstance()->playSound("Throw", 0.3f);
-		spear = new CSpear(spearDir*spearSpd + velocity);
-		spear->Initalise(camera, 30,60, getPos().x, getPos().y, spearProg, spearTex);
+		spear = new CSpear();
+		spear->Initalise(camera, getPos().x, getPos().y, this->getWorld(), spearDir*spearSpd);
 	}
 
-	if (spear != 0)
+	if (spear)
 	{
-		glm::vec2 tipPos = glm::vec2(spear->getScale().x / 2, 0);
-		tipPos = glm::vec2(spear->getRotMat() * glm::vec4(tipPos, 0.0f, 1.0f));
-		tipPos += spear->getPos();
+		spear->physicsUpdate();
 
-		for (CTile *tile : level) {
-			if (!spear->isInWall() && spear->getCollider().collide(tile->GetCollider())) {
-				CAudio::getInstance()->playSound("SpearLand", 0.3f);
-				spear->setInWall(true);
-				break;
-			}
-		}
+		b2Vec2 vecToOther = otherPlayer.body->GetPosition() - body->GetPosition();
+		glm::vec2 vecToOther2{ vecToOther.x, vecToOther.y };
+		vecToOther2 = glm::normalize(vecToOther2);
 
-		while (spear->getPos().x < -0.5f * static_cast<float>(SCR_WIDTH)) {
-			spear->translate(X, static_cast<float>(SCR_WIDTH), true);
-		}
-		while (spear->getPos().x > 0.5f * static_cast<float>(SCR_WIDTH)) {
-			spear->translate(X, -static_cast<float>(SCR_WIDTH), true);
-		}
-
-		while (spear->getPos().y > 0.5f * static_cast<float>(SCR_HEIGHT)) {
-			spear->translate(Y, -static_cast<float>(SCR_HEIGHT), true);
-		}
-
-		while (spear->getPos().y < -0.5f * static_cast<float>(SCR_HEIGHT)) {
-			spear->translate(Y, static_cast<float>(SCR_HEIGHT), true);
-		}
-
-		spear->update(deltaTime);
-		if (collider.collide(spear->getCollider()) && spear->isInWall() && punch)
+		if (punch && vecToOther.LengthSquared() < meleeRange*meleeRange && std::acos(glm::dot(vecToOther2, spearDir)) < 3.1415926535f * 0.33333333f)
 		{
+			//std::cout << "hit" << std::endl;
+			otherPlayer.hit(10);
+		}
+
+
+		vecToOther = otherPlayer.getSpear()->body->GetPosition() - body->GetPosition();
+		vecToOther2 = glm::vec2{ vecToOther.x, vecToOther.y };
+
+		if (punch && vecToOther.LengthSquared() < meleeRange*meleeRange && std::acos(glm::dot(vecToOther2, spearDir)) < 3.1415926535f * 0.33333333f)
+		{
+			spear->destroyBody();
 			delete spear;
 			spear = 0;
 		}
-		else if (otherPlayer.getSpear() != 0 && collider.collide(otherPlayer.getSpear()->getCollider()) && otherPlayer.getSpear()->isInWall() && punch)
+
+		vecToOther = spear->body->GetPosition() - body->GetPosition();
+		vecToOther2 = glm::vec2{ vecToOther.x, vecToOther.y };
+
+		if (punch && vecToOther.LengthSquared() < meleeRange*meleeRange && std::acos(glm::dot(vecToOther2, spearDir)) < 3.1415926535f * 0.33333333f)
 		{
-			spear = otherPlayer.swapSpear(spear);
+			spear->destroyBody();
 			delete spear;
 			spear = 0;
 		}
+
+		//	glm::vec2 tipPos = glm::vec2(spear->getScale().x / 2, 0);
+		//	tipPos = glm::vec2(spear->getRotMat() * glm::vec4(tipPos, 0.0f, 1.0f));
+		//	tipPos += spear->getPos();
+
+		//	for (CTile *tile : level) {
+		//		if (!spear->isInWall() && spear->getCollider().collide(tile->GetCollider())) {
+		//			CAudio::getInstance()->playSound("SpearLand", 0.3f);
+		//			spear->setInWall(true);
+		//			break;
+		//		}
+		//	}
+
+		//	spear->update(deltaTime);
+		//	if (collider.collide(spear->getCollider()) && spear->isInWall() && punch)
+		//	{
+		//		delete spear;
+		//		spear = 0;
+		//	}
+		//	else if (otherPlayer.getSpear() != 0 && collider.collide(otherPlayer.getSpear()->getCollider()) && otherPlayer.getSpear()->isInWall() && punch)
+		//	{
+		//		spear = otherPlayer.swapSpear(spear);
+		//		delete spear;
+		//		spear = 0;
+		//	}
+		//}
+
+		//if (spearDir.x < 0)
+		//{
+		//	meleeRange.initalise(1.0f, 0.0f, 0.5f, 0.5f, this);
+		//}
+		//else if (spearDir.x > 0)
+		//{
+		//	meleeRange.initalise(0.0f, 1.0f, 0.5f, 0.5f, this);
+		//}
+
+		//if (punch && meleeRange.collide(otherPlayer.getCollider()) && spear == 0)
+		//{
+		//	//std::cout << "hit" << std::endl;
+		//	otherPlayer.hit(10);
+		//}
+
+		//if (otherPlayer.getSpear() != 0 && collider.collide(otherPlayer.getSpear()->getCollider()) && !otherPlayer.getSpear()->isInWall())
+		//{
+		//	//std::cout << "ow" << std::endl;
+		//	hit(100);
 	}
 
-	if (spearDir.x < 0)
-	{
-		meleeRange.initalise(1.0f, 0.0f, 0.5f, 0.5f, this);
-	}
-	else if (spearDir.x > 0)
-	{
-		meleeRange.initalise(0.0f, 1.0f, 0.5f, 0.5f, this);
-	}
-
-	if (punch && meleeRange.collide(otherPlayer.getCollider()) && spear == 0)
-	{
-		//std::cout << "hit" << std::endl;
-		otherPlayer.hit(10);
-	}
-
-	if (otherPlayer.getSpear() != 0 && collider.collide(otherPlayer.getSpear()->getCollider()) && !otherPlayer.getSpear()->isInWall())
-	{
-		//std::cout << "ow" << std::endl;
-		hit(100);
-	}
-	
+	this->physicsUpdate();
 }
 
 void CPlayer::render()
@@ -266,16 +197,15 @@ void CPlayer::render()
 
 void CPlayer::reset()
 {
-	velocity = glm::vec2();
 	health = maxHealth;
 	grounded = false;
 	upLast = true;
 
-	translate(X, spawnPoint.x, false);
-	translate(Y, spawnPoint.y, false);
+	body->SetTransform(b2Vec2(spawnPoint.x / PPM, spawnPoint.y / PPM), 0);
 
 	if (spear)
 	{
+		spear->destroyBody();
 		delete spear;
 		spear = 0;
 	}

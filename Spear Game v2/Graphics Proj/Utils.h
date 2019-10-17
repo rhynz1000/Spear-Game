@@ -1,5 +1,9 @@
 #pragma once
 
+#define SPEAR_CATEGORY					0b10000000
+#define PLAYER_CATEGORY					0b01000000
+#define PLATFORM_CATEGORY				0b00100000
+
 //dependency includes
 #include <glew.h>
 //#include <freeglut.h>
@@ -24,8 +28,6 @@
 //utilities for use throughout the program
 
 //utilities for use throughout the program
-
-
 
 namespace
 {

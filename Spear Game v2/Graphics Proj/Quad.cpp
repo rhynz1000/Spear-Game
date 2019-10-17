@@ -26,6 +26,7 @@ void CQuad::Initalise(CCamera* newCamera, float sizeH, float sizeW, float inital
 
 	this->body = body;
 	//this->setBody(body);
+	setWorld(world);
 }
 
 //initalises without physics body

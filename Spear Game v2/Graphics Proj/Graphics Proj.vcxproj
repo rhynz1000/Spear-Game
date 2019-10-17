@@ -165,7 +165,6 @@
     <ClInclude Include="DestObj.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="Input.h" />
-    <ClInclude Include="Masks.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Quad.h" />
     <ClInclude Include="ShaderLoader.h" />
