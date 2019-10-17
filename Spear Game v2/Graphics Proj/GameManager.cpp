@@ -17,6 +17,8 @@ void CGameManager::initalise(CInput* input)
 
 	state = MainMenu;
 	option = 0;
+	P1Connected = 0;
+	P2Connected = 0;
 	GameInput = input;
 	program = ShaderLoader::CreateProgram("Resources/Shaders/Basic.ver", "Resources/Shaders/Basic.frag");
 	program1 = ShaderLoader::CreateProgram("Resources/Shaders/Basic.ver", "Resources/Shaders/Colour.frag");
@@ -82,15 +84,17 @@ void CGameManager::update()
 			{
 				if (option == 0)
 				{
-					if ((GameInput->isJoystickValid(0)) || dev)
-					{
-						loadLevel(level1);
-						state = Game;
-					}
-					else
-					{
-						std::cout << "No Controller Connected" << std::endl;
-					}
+					//if ((GameInput->isJoystickValid(0)) || dev)
+					//{
+					//	loadLevel(level1);
+					//	state = Game;
+					//}
+					//else
+					//{
+					//	std::cout << "No Controller Connected" << std::endl;
+					//}
+
+					state = Lobby;
 				}
 				else if (option == 1)
 				{
@@ -125,6 +129,28 @@ void CGameManager::update()
 				}
 			}
 			break;
+
+			case 4:
+			{
+				if ((GameInput->isJoystickValid(0)) || dev)
+				{
+					P1Connected = 1;
+				}
+				if ((GameInput->isJoystickValid(1)) || dev)
+				{
+					P2Connected = 1;
+				}
+
+				if (P1Connected == 1 || P2Connected == 2)
+				{
+					loadLevel(level1);
+					state = Game;
+				}
+				else
+				{
+					std::cout << "Not enough players." << std::endl;
+				}
+			}
 
 			default:
 				break;
@@ -282,11 +308,11 @@ void CGameManager::render()
 	case Lobby:
 	{
 		LMenu1.render(glm::mat4());
-		if (P1 == 1)
+		if (P1Connected == 1)
 		{
 			P1Cont.render(glm::mat4());
 		}
-		if (P2 == 1)
+		if (P2Connected == 1)
 		{
 			P2Cont.render(glm::mat4());
 		}

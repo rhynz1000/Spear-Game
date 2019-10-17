@@ -54,6 +54,8 @@ private:
 	float spdMultiplier = 1;
 
 	int option;
+	int P1Connected;
+	int P2Connected;
 	GameState state;
 	bool axisLast = false;
 	bool confirmLast = false;
