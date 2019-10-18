@@ -19,6 +19,11 @@ enum GameState
 	Lobby,
 };
 
+struct StickyInfo {
+	b2Body* spearBody;
+	b2Body* targetBody;
+};
+
 class CGameManager : b2ContactListener
 {
 public:
@@ -35,7 +40,7 @@ public:
 	void devModeSwitch() { dev = !dev; }
 
 	void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override;
-	//void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) override;
+	void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) override;
 
 private:
 	CInput* GameInput;
@@ -63,15 +68,14 @@ private:
 	bool dev = false;
 	bool endgame = false;
 
-	bool spearStuck = false;
-	b2WeldJointDef spearJoint;
-
 	std::chrono::duration<float> deltaTime;
 	std::chrono::time_point<std::chrono::high_resolution_clock> previousTime;
 
 	TextLabel victory, p1Health, p2Health, p1Dash, p2Dash, score;
 
 	float phyTimeStep;
+
+	std::vector<StickyInfo> spearsStuck;
 
 	b2World* world;
 };

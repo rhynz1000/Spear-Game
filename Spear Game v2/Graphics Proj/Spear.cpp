@@ -26,7 +26,6 @@ void CSpear::Initalise(CCamera * cam, float initalx, float initaly, b2World * wo
 	//fix.filter.maskBits = 0b0;
 
 	//body->CreateFixture(&fix);
-	setId(4);
 	//body->GetFixtureList()[0].SetSensor(true);
 
 	glm::vec2 norm = glm::normalize(impulse);
@@ -36,17 +35,29 @@ void CSpear::Initalise(CCamera * cam, float initalx, float initaly, b2World * wo
 	body->SetTransform(body->GetPosition(), (3.14159f/2.0f) - angle);
 
 	body->ApplyLinearImpulseToCenter(b2Vec2(impulse.x, impulse.y), true);
+
+	body->SetAngularDamping(3);
 }
 
 void CSpear::physicsUpdate()
 {
-	b2Vec2 vel = body->GetLinearVelocity();
-	if (vel.LengthSquared() > 1)
+	/*if (vel.LengthSquared() > 1)
 	{
 		float angle = atan2f(vel.x, vel.y);
 
 		body->SetTransform(body->GetPosition(), (3.14159f / 2.0f) - angle);
-	}
+	}*/
+
+	b2Vec2 pointingDirection = body->GetWorldVector(b2Vec2(0.5, 0));
+	b2Vec2 flightDirection = body->GetLinearVelocity();
+	float flightSpeed = flightDirection.Normalize();//normalizes and returns length
+
+	float dot = b2Dot(flightDirection, pointingDirection);
+	float dragForceMagnitude = (1 - fabs(dot)) * flightSpeed * flightSpeed * dragConstant * body->GetMass();
+
+	b2Vec2 arrowTailPosition = body->GetWorldPoint(b2Vec2(-0.5, 0));
+	body->ApplyForce(dragForceMagnitude * -flightDirection, arrowTailPosition, true);
+
 
 	while (body->GetPosition().x < -0.5f * static_cast<float>(B2_WIDTH)) {
 		body->SetTransform(b2Vec2(body->GetPosition().x + B2_WIDTH, body->GetPosition().y), body->GetAngle());

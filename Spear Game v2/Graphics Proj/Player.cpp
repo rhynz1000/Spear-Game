@@ -98,7 +98,8 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 	{
 		CAudio::getInstance()->playSound("Throw", 0.3f);
 		spear = new CSpear();
-		spear->Initalise(camera, getPos().x, getPos().y, this->getWorld(), spearDir*spearSpd);
+		spear->Initalise(camera, getPos().x + spearDir.x, getPos().y + spearDir.y, this->getWorld(), spearDir*spearSpd);
+		spear->setId(this->getId() + 3);
 	}
 
 	if (spear)
@@ -115,25 +116,31 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 			otherPlayer.hit(10);
 		}
 
-
-		vecToOther = otherPlayer.getSpear()->body->GetPosition() - body->GetPosition();
-		vecToOther2 = glm::vec2{ vecToOther.x, vecToOther.y };
-
-		if (punch && vecToOther.LengthSquared() < meleeRange*meleeRange && std::acos(glm::dot(vecToOther2, spearDir)) < 3.1415926535f * 0.33333333f)
+		if (otherPlayer.getSpear())
 		{
-			spear->destroyBody();
-			delete spear;
-			spear = 0;
+			vecToOther = otherPlayer.getSpear()->body->GetPosition() - body->GetPosition();
+			vecToOther2 = glm::vec2{ vecToOther.x, vecToOther.y };
+
+			if (punch && vecToOther.LengthSquared() < meleeRange*meleeRange && std::acos(glm::dot(vecToOther2, spearDir)) < 3.1415926535f * 0.33333333f)
+			{
+				spear = otherPlayer.swapSpear(spear);
+				spear->destroyBody();
+				delete spear;
+				spear = 0;
+			}
 		}
 
-		vecToOther = spear->body->GetPosition() - body->GetPosition();
-		vecToOther2 = glm::vec2{ vecToOther.x, vecToOther.y };
-
-		if (punch && vecToOther.LengthSquared() < meleeRange*meleeRange && std::acos(glm::dot(vecToOther2, spearDir)) < 3.1415926535f * 0.33333333f)
+		if (spear)
 		{
-			spear->destroyBody();
-			delete spear;
-			spear = 0;
+			vecToOther = spear->body->GetPosition() - body->GetPosition();
+			vecToOther2 = glm::vec2{ vecToOther.x, vecToOther.y };
+
+			if (punch && vecToOther.LengthSquared() < meleeRange*meleeRange && std::acos(glm::dot(vecToOther2, spearDir)) < 3.1415926535f * 0.33333333f)
+			{
+				spear->destroyBody();
+				delete spear;
+				spear = 0;
+			}
 		}
 
 		//	glm::vec2 tipPos = glm::vec2(spear->getScale().x / 2, 0);

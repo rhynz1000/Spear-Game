@@ -3,6 +3,7 @@
 GLuint program, program1;
 CQuad testPlat, testPlay;
 
+
 void CGameManager::initalise(CInput* input)
 {
 	camera.orthoInti(B2_WIDTH, B2_HEIGHT, 0.1f, 100.0f);
@@ -261,12 +262,19 @@ void CGameManager::update()
 			world->ClearForces();
 			phyTimeStep = 0;
 
-			if (spearStuck)
+			for (StickyInfo si : spearsStuck)
 			{
-				world->CreateJoint(&spearJoint);
-				spearStuck = false;
-			}
+				b2Vec2 worldCoordsAnchorPoint = si.spearBody->GetWorldPoint(b2Vec2(0.6f, 0));
 
+				b2WeldJointDef weldJointDef;
+				weldJointDef.bodyA = si.targetBody;
+				weldJointDef.bodyB = si.spearBody;
+				weldJointDef.localAnchorA = weldJointDef.bodyA->GetLocalPoint(worldCoordsAnchorPoint);
+				weldJointDef.localAnchorB = weldJointDef.bodyB->GetLocalPoint(worldCoordsAnchorPoint);
+				weldJointDef.referenceAngle = weldJointDef.bodyB->GetAngle() - weldJointDef.bodyA->GetAngle();
+				world->CreateJoint(&weldJointDef);
+			}
+			spearsStuck.clear();
 		}
 		/*testPlay.update();*/
 	}
@@ -373,26 +381,45 @@ void CGameManager::loadLevel(CLevel & level)
 void CGameManager::PreSolve(b2Contact * contact, const b2Manifold * oldManifold)
 {
 
-	if ((int)contact->GetFixtureA()->GetBody()->GetUserData() == 1 && (int)contact->GetFixtureB()->GetBody()->GetUserData() == 3)
+	if ((int)contact->GetFixtureA()->GetBody()->GetUserData() == 1 && (int)contact->GetFixtureB()->GetBody()->GetUserData() >= 3)
 	{
 		if (contact->GetFixtureA()->GetAABB(0).lowerBound.y + 2.0f * b2_linearSlop > contact->GetFixtureB()->GetAABB(0).upperBound.y)
 		{
 			player1.setGrounded(true);
 		}
 	}
-	else if ((int)contact->GetFixtureA()->GetBody()->GetUserData() == 2 && (int)contact->GetFixtureB()->GetBody()->GetUserData() == 3)
+	else if ((int)contact->GetFixtureA()->GetBody()->GetUserData() == 2 && (int)contact->GetFixtureB()->GetBody()->GetUserData() >= 3)
 	{
 		if (contact->GetFixtureA()->GetAABB(0).lowerBound.y + 2.0f * b2_linearSlop> contact->GetFixtureB()->GetAABB(0).upperBound.y)
 		{
 			player2.setGrounded(true);
 		}
 	}
-	else if ((int)contact->GetFixtureA()->GetBody()->GetUserData() == 3 && (int)contact->GetFixtureB()->GetBody()->GetUserData() == 4)
+	
+}
+
+void CGameManager::PostSolve(b2Contact * contact, const b2ContactImpulse * impulse)
+{
+	if ((int)contact->GetFixtureA()->GetBody()->GetUserData() == 3 && (int)contact->GetFixtureB()->GetBody()->GetUserData() == 4)
 	{
-		spearStuck = true;
-		spearJoint.bodyA = contact->GetFixtureA()->GetBody();
-		spearJoint.bodyB = contact->GetFixtureB()->GetBody();
-		spearJoint.localAnchorA = contact->GetFixtureA()->GetBody()->GetLocalPoint(contact->GetFixtureB()->GetBody()->GetPosition());
-		//spearJoint.localAnchorB;
+		StickyInfo si;
+		si.targetBody = contact->GetFixtureA()->GetBody();
+		si.spearBody = contact->GetFixtureB()->GetBody();
+		spearsStuck.push_back(si);
+	}
+	else if ((int)contact->GetFixtureA()->GetBody()->GetUserData() == 3 && (int)contact->GetFixtureB()->GetBody()->GetUserData() == 5)
+	{
+		StickyInfo si;
+		si.targetBody = contact->GetFixtureA()->GetBody();
+		si.spearBody = contact->GetFixtureB()->GetBody();
+		spearsStuck.push_back(si);
+	}
+	else if ((int)contact->GetFixtureA()->GetBody()->GetUserData() == 1 && (int)contact->GetFixtureB()->GetBody()->GetUserData() == 5)
+	{
+		player1.hit(100);
+	}
+	else if ((int)contact->GetFixtureA()->GetBody()->GetUserData() == 2 && (int)contact->GetFixtureB()->GetBody()->GetUserData() == 4)
+	{
+		player2.hit(100);
 	}
 }

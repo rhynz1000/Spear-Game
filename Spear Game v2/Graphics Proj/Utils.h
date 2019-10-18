@@ -11,7 +11,6 @@
 #include "glm.hpp"
 #include "gtc/matrix_transform.hpp"
 #include "gtc/type_ptr.hpp"
-#include "glfw3.h"
 
 //libary includes
 #include <iostream>
@@ -20,6 +19,8 @@
 #include <ctime>
 #include <chrono>
 #include <filesystem>
+
+#include "glfw3.h"
 
 #include "ShaderLoader.h"
 #include "Texture.h"
