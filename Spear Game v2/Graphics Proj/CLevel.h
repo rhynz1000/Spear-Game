@@ -10,6 +10,8 @@ public:
 	std::vector<CTile*>& GetTiles();
 private:
 	std::vector<CTile*> tileArray;
+	std::vector<glm::vec2> topTiles, undergroundTiles;
+	b2Body * body;
 	CQuad* background;
 };
 
