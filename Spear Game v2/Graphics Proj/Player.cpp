@@ -50,7 +50,7 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 	}
 
 
-	body->ApplyForceToCenter(b2Vec2(horizontalSpeed *deltaTime * speed* (grounded ? 5.0f : 1.0f), 0), true);
+	body->ApplyForceToCenter(b2Vec2(horizontalSpeed *deltaTime * speed* (grounded ? 4.0f : 1.0f), 0), true);
 
 	if (up && grounded)
 	{
@@ -106,22 +106,15 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 	{
 		spear->physicsUpdate();
 
-		b2Vec2 vecToOther = otherPlayer.body->GetPosition() - body->GetPosition();
-		glm::vec2 vecToOther2{ vecToOther.x, vecToOther.y };
-		vecToOther2 = glm::normalize(vecToOther2);
-
-		if (punch && vecToOther.LengthSquared() < meleeRange*meleeRange && std::acos(glm::dot(vecToOther2, spearDir)) < 3.1415926535f * 0.33333333f)
-		{
-			//std::cout << "hit" << std::endl;
-			otherPlayer.hit(10);
-		}
+		b2Vec2 vecToOther;
+		glm::vec2 vecToOther2;
 
 		if (otherPlayer.getSpear())
 		{
 			vecToOther = otherPlayer.getSpear()->body->GetPosition() - body->GetPosition();
 			vecToOther2 = glm::vec2{ vecToOther.x, vecToOther.y };
 
-			if (punch && vecToOther.LengthSquared() < meleeRange*meleeRange && std::acos(glm::dot(vecToOther2, spearDir)) < 3.1415926535f * 0.33333333f)
+			if (punch && vecToOther.LengthSquared() < meleeRange*meleeRange && std::acos(glm::dot(glm::normalize(vecToOther2), glm::normalize(spearDir)))  < 3.1415926535f * 0.33333333f)
 			{
 				spear = otherPlayer.swapSpear(spear);
 				spear->destroyBody();
@@ -135,59 +128,26 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 			vecToOther = spear->body->GetPosition() - body->GetPosition();
 			vecToOther2 = glm::vec2{ vecToOther.x, vecToOther.y };
 
-			if (punch && vecToOther.LengthSquared() < meleeRange*meleeRange && std::acos(glm::dot(vecToOther2, spearDir)) < 3.1415926535f * 0.33333333f)
+			//std::cout << vecToOther.LengthSquared() << ", " << std::acos(glm::dot(glm::normalize(vecToOther2), glm::normalize(spearDir))) << std::endl;
+
+			if (punch && vecToOther.LengthSquared() < meleeRange*meleeRange && std::acos(glm::dot(glm::normalize(vecToOther2), glm::normalize(spearDir))) < 3.1415926535f * 0.33333333f)
 			{
 				spear->destroyBody();
 				delete spear;
 				spear = 0;
 			}
 		}
+	}
+	else
+	{
+		b2Vec2 vecToOther = otherPlayer.body->GetPosition() - body->GetPosition();
+		glm::vec2 vecToOther2{ vecToOther.x, vecToOther.y };
 
-		//	glm::vec2 tipPos = glm::vec2(spear->getScale().x / 2, 0);
-		//	tipPos = glm::vec2(spear->getRotMat() * glm::vec4(tipPos, 0.0f, 1.0f));
-		//	tipPos += spear->getPos();
-
-		//	for (CTile *tile : level) {
-		//		if (!spear->isInWall() && spear->getCollider().collide(tile->GetCollider())) {
-		//			CAudio::getInstance()->playSound("SpearLand", 0.3f);
-		//			spear->setInWall(true);
-		//			break;
-		//		}
-		//	}
-
-		//	spear->update(deltaTime);
-		//	if (collider.collide(spear->getCollider()) && spear->isInWall() && punch)
-		//	{
-		//		delete spear;
-		//		spear = 0;
-		//	}
-		//	else if (otherPlayer.getSpear() != 0 && collider.collide(otherPlayer.getSpear()->getCollider()) && otherPlayer.getSpear()->isInWall() && punch)
-		//	{
-		//		spear = otherPlayer.swapSpear(spear);
-		//		delete spear;
-		//		spear = 0;
-		//	}
-		//}
-
-		//if (spearDir.x < 0)
-		//{
-		//	meleeRange.initalise(1.0f, 0.0f, 0.5f, 0.5f, this);
-		//}
-		//else if (spearDir.x > 0)
-		//{
-		//	meleeRange.initalise(0.0f, 1.0f, 0.5f, 0.5f, this);
-		//}
-
-		//if (punch && meleeRange.collide(otherPlayer.getCollider()) && spear == 0)
-		//{
-		//	//std::cout << "hit" << std::endl;
-		//	otherPlayer.hit(10);
-		//}
-
-		//if (otherPlayer.getSpear() != 0 && collider.collide(otherPlayer.getSpear()->getCollider()) && !otherPlayer.getSpear()->isInWall())
-		//{
-		//	//std::cout << "ow" << std::endl;
-		//	hit(100);
+		if (punch && vecToOther.LengthSquared() < meleeRange*meleeRange && std::acos(glm::dot(glm::normalize(vecToOther2), glm::normalize(spearDir))) < 3.1415926535f * 0.33333333f)
+		{
+			//std::cout << "hit" << std::endl;
+			otherPlayer.hit(10);
+		}
 	}
 
 	this->physicsUpdate();
