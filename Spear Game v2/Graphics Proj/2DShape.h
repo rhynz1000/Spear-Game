@@ -1,19 +1,6 @@
 #pragma once
 
-#include <Box2D/Box2D.h>
-
-#include <glew.h>
-#include <freeglut.h>
-#include <SOIL.h>
-#include <vector>
-
-#include "glm.hpp"
-#include "gtc/matrix_transform.hpp"
-#include "gtc/type_ptr.hpp"
-
-#include "Camera.h"
 #include "Utils.h"
-
 
 class C2DShape
 {

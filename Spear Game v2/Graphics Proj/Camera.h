@@ -1,7 +1,6 @@
 #pragma once
 
 #include "glm.hpp"
-#include "Utils.h"
 
 enum AXIS {
 	X,

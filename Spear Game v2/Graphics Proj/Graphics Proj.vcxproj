@@ -139,7 +139,6 @@
     <ClCompile Include="animation.cpp" />
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="CCollider.cpp" />
     <ClCompile Include="Circle.cpp" />
     <ClCompile Include="CLevel.cpp" />
     <ClCompile Include="CTile.cpp" />
@@ -158,7 +157,6 @@
     <ClInclude Include="animation.h" />
     <ClInclude Include="Audio.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="CCollider.h" />
     <ClInclude Include="Circle.h" />
     <ClInclude Include="CLevel.h" />
     <ClInclude Include="CTile.h" />

@@ -4,6 +4,8 @@
 #define PLAYER_CATEGORY					0b01000000
 #define PLATFORM_CATEGORY				0b00100000
 
+#include <Box2D/Box2D.h>
+
 //dependency includes
 #include <glew.h>
 //#include <freeglut.h>
@@ -20,11 +22,11 @@
 #include <chrono>
 #include <filesystem>
 
-#include "glfw3.h"
-
 #include "ShaderLoader.h"
 #include "Texture.h"
 #include "Camera.h"
+
+#include "glfw3.h"
 
 //utilities for use throughout the program
 

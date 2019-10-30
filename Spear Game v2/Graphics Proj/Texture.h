@@ -2,8 +2,6 @@
 
 // Dependency Includes
 #include <glew.h>
-//#include <freeglut.h>
-#include "Dependencies/GLFW/glfw3.h"
 
 #include <map>
 

@@ -1,22 +1,13 @@
 #pragma once
 // Dependency Includes
-#include <glew.h>
-//#include <freeglut.h>
-#include <SOIL.h>
-#include <glm.hpp>
-#include <gtc\matrix_transform.hpp>
-#include <gtc\type_ptr.hpp>
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include "Dependencies/GLFW/glfw3.h"
 
 // Library Includes
 #include <map>
 #include <string>
-#include <iostream>
 
 // Local Includes
-#include "ShaderLoader.h"
 #include "Utils.h"
 
 struct FontChar

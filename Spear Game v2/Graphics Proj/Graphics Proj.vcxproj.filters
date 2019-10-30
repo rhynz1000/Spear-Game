@@ -51,9 +51,6 @@
     <ClCompile Include="Circle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CCollider.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CLevel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -105,9 +102,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DestObj.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CCollider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CLevel.h">

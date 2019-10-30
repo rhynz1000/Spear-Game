@@ -1,9 +1,7 @@
 #pragma once
 
 //local includes
-#include <Box2D/Box2D.h>
 #include "Input.h"
-#include "Utils.h"
 #include "Quad.h"
 #include "Audio.h"
 #include "TextLabel.h"

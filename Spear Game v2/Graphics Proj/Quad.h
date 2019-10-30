@@ -1,7 +1,5 @@
 #pragma once
 
-#include "glm.hpp"
-//#include <Box2D/Box2D.h>
 #include "2DShape.h"
 
 class CQuad : public C2DShape
