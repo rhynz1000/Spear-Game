@@ -59,7 +59,7 @@ void CLevel::LoadFromCSV(std::string filePath, CCamera * camera, GLuint prog, b2
 
 	b2BodyDef def;
 	def.type = b2_staticBody;
-	def.position = b2Vec2(B2_WIDTH * 0.5f, B2_HEIGHT * 0.5f);
+	def.position = b2Vec2((B2_WIDTH * 0.5f), B2_HEIGHT * 0.5f);
 
 	b2Body* body = world->CreateBody(&def);
 	body->SetUserData((void*)3);//Set registered type in box2d to a platform
@@ -93,7 +93,7 @@ void CLevel::LoadFromCSV(std::string filePath, CCamera * camera, GLuint prog, b2
 				yOffset--;
 
 				b2PolygonShape box;
-				box.SetAsBox((xOffset + 1) * 0.5f, (yOffset + 1) * 0.5f, b2Vec2(-(x + (xOffset + 1) * 0.5f) , -(y + (yOffset + 1) * 0.5f)), 0.0f);
+				box.SetAsBox((xOffset + 1) * 0.5f, (yOffset + 1) * 0.5f, b2Vec2((x + (xOffset + 1) * 0.5f) - (B2_WIDTH), -(y + (yOffset + 1) * 0.5f)), 0.0f);
 
 				b2FixtureDef fix;
 				fix.shape = &box;
