@@ -234,8 +234,8 @@ void CGameManager::update()
 		player1.update(DT, level1.GetTiles(), player2);
 		player2.update(DT, level1.GetTiles(), player1);
 
-		P1CurHealth = (player1.getHealth() / 100 - 1.0) * 0.8;
-		P2CurHealth = (player2.getHealth() / 100 - 1.0) * 0.8;
+		P1CurHealth = (player1.getHealth() / 100 - 1.0) * -8;
+		P2CurHealth = (player2.getHealth() / 100 - 1.0) * -8;
 		p1Dash.SetText("Dash : " + std::to_string(player1.isDashReady()));
 		p2Dash.SetText("Dash : " + std::to_string(player2.isDashReady()));
 
