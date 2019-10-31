@@ -14,7 +14,7 @@ public:
 	~CPlayer() {}
 
 	void initalise(CInput* input, CCamera* newCamera, float sizeH, float sizeW, float initalX, float initalY, GLuint prog, GLuint playerTex, int joy, GLuint initSpearTex, b2World* world);
-	void update(float deltaTime, std::vector<CTile*> & level, CPlayer &otherPlayer);
+	void update(float deltaTime, CPlayer &otherPlayer);
 	void render();
 	void hit(float damage) { health -= damage; CAudio::getInstance()->playSound("Hit", 0.3f); }
 	void reset();
@@ -47,6 +47,6 @@ private:
 	const float maxHealth = 100;
 	glm::vec2 spawnPoint;
 	int score = 0;
-	float jumpForce = 600.0f;
+	float jumpForce = 10.0f;
 	const float meleeRange = 2.0f;
 };

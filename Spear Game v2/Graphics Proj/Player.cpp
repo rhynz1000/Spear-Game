@@ -15,7 +15,7 @@ void CPlayer::initalise(CInput * input, CCamera* newCamera, float sizeH, float s
 	spawnPoint = glm::vec2(initalX, initalY);
 }
 
-void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &otherPlayer)
+void CPlayer::update(float deltaTime, CPlayer &otherPlayer)
 {
 	bool up, left, right, shoot, punch, dash;
 
@@ -31,6 +31,8 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 	
 	float halfScrWidth = ((float)SCR_WIDTH) / 2;
 	float halfScrHeight = ((float)SCR_HEIGHT) / 2;
+
+	body->SetLinearDamping(grounded ? 4.0f : 0.1f);
 
 	if (gameInput->isJoystickValid(joystick))
 	{
@@ -55,12 +57,14 @@ void CPlayer::update(float deltaTime, std::vector<CTile*> & level, CPlayer &othe
 	if (up && grounded)
 	{
 		CAudio::getInstance()->playSound("Jump", 0.3f);
-		body->ApplyLinearImpulseToCenter(b2Vec2(0, jumpForce * deltaTime), true);
+		//body->ApplyLinearImpulseToCenter(b2Vec2(0, jumpForce * deltaTime), true);
+		body->SetLinearVelocity({ body->GetLinearVelocity().x, jumpForce });
 		canDoubleJump = true;
 	}
 	else if (up && canDoubleJump) {
 		CAudio::getInstance()->playSound("Jump", 0.3f);
-		body->ApplyLinearImpulseToCenter(b2Vec2(0, jumpForce * deltaTime), true);
+		//body->ApplyLinearImpulseToCenter(b2Vec2(0, jumpForce * deltaTime), true);
+		body->SetLinearVelocity({ body->GetLinearVelocity().x, jumpForce });
 		canDoubleJump = false;
 	}
 

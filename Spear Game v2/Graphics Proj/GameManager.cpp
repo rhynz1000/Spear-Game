@@ -206,8 +206,8 @@ void CGameManager::update()
 		float DT = deltaTime.count() > 0.1f ? 0.1f : deltaTime.count();
 		DT *= spdMultiplier;
 
-		player1.update(DT, level1.GetTiles(), player2);
-		player2.update(DT, level1.GetTiles(), player1);
+		player1.update(DT, player2);
+		player2.update(DT, player1);
 
 		p1Health.SetText("P1 Health : " + std::to_string((int)player1.getHealth()));
 		p2Health.SetText("P2 Health : " + std::to_string((int)player2.getHealth()));
