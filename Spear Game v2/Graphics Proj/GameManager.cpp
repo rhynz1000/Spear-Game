@@ -74,23 +74,6 @@ void CGameManager::update()
 		down = GameInput->checkKeyDownFirst(KEY, GLFW_KEY_DOWN);
 		confirm = GameInput->checkKeyDownFirst(KEY, GLFW_KEY_ENTER);
 
-		if (P1MovHealth != P1CurHealth)
-		{
-			P1MovHealth = P1MovHealth - ((P1MovHealth - P1CurHealth) / 100);
-		}
-		if (P1MovHealth < P1CurHealth)
-		{
-			P1MovHealth = P1CurHealth;
-		}
-		if (P2MovHealth != P2CurHealth)
-		{
-			P2MovHealth = P2MovHealth - ((P2MovHealth - P2CurHealth) / 100);
-		}
-		if (P2MovHealth < P2CurHealth)
-		{
-			P2MovHealth = P2CurHealth;
-		}
-
 		if (GameInput->isJoystickValid(0))
 		{
 			GLFWgamepadstate gpState = GameInput->getJoystickInput(0);
@@ -234,10 +217,27 @@ void CGameManager::update()
 		player1.update(DT, level1.GetTiles(), player2);
 		player2.update(DT, level1.GetTiles(), player1);
 
-		P1CurHealth = (player1.getHealth() / 100 - 1.0) * -8;
-		P2CurHealth = (player2.getHealth() / 100 - 1.0) * -8;
+		P1CurHealth = (player1.getHealth() / 100 - 1.0) * 8;
+		P2CurHealth = (player2.getHealth() / 100 - 1.0) * 8;
 		p1Dash.SetText("Dash : " + std::to_string(player1.isDashReady()));
 		p2Dash.SetText("Dash : " + std::to_string(player2.isDashReady()));
+
+		if (P1MovHealth != P1CurHealth)
+		{
+			P1MovHealth = P1MovHealth - ((P1MovHealth - P1CurHealth) / 100);
+		}
+		if (P1MovHealth < P1CurHealth)
+		{
+			P1MovHealth = P1CurHealth;
+		}
+		if (P2MovHealth != P2CurHealth)
+		{
+			P2MovHealth = P2MovHealth - ((P2MovHealth - P2CurHealth) / 100);
+		}
+		if (P2MovHealth < P2CurHealth)
+		{
+			P2MovHealth = P2CurHealth;
+		}
 
 		if (player1.getHealth() <= 0 || player2.getHealth() <= 0)
 		{
@@ -290,6 +290,8 @@ void CGameManager::update()
 			for (StickyInfo si : spearsStuck)
 			{
 				b2Vec2 worldCoordsAnchorPoint = si.spearBody->GetWorldPoint(b2Vec2(0.6f, 0));
+
+				si.spearBody->SetUserData((void*)3);
 
 				b2WeldJointDef weldJointDef;
 				weldJointDef.bodyA = si.targetBody;
