@@ -49,13 +49,13 @@ void CGameManager::initalise(CInput* input)
 	p2Dash.init("P2 Dash: ", "Resources/Fonts/arial.ttf", glm::vec2(((int)SCR_WIDTH / 2) - 350, (-(int)SCR_HEIGHT / 2) + 60), glm::vec3(1, 1, 1), 1);
 	score.init("0 : 0", "Resources/Fonts/arial.ttf", glm::vec2(-50, ((int)SCR_HEIGHT / 2) - 70), glm::vec3(1,1,1), 1);
 
-	ScoreBoard.Initalise(&camera, 200 / PPM, 600 / PPM, 0, 500 / PPM, program, TextureLoader::get("ScoreBar"));
-	P1HBack.Initalise(&camera, 150 / PPM, 500 / PPM, -710 / PPM, -460 / PPM, program, TextureLoader::get("HealthBack"), 0);
-	P1HRed.Initalise(&camera, 150 / PPM, 500 / PPM, -710 / PPM, -460 / PPM, program, TextureLoader::get("HealthRed"), 0);
-	P1HGreen.Initalise(&camera, 150 / PPM, 500 / PPM, -710 / PPM, -460 / PPM, program, TextureLoader::get("HealthGreen"), 0);
-	P2HBack.Initalise(&camera, 150 / PPM, 500 / PPM, 710 / PPM, -460 / PPM, program, TextureLoader::get("HealthBack"), 1);
-	P2HRed.Initalise(&camera, 150 / PPM, 500 / PPM, 710 / PPM, -460 / PPM, program, TextureLoader::get("HealthRed"), 1);
-	P2HGreen.Initalise(&camera, 150 / PPM, 500 / PPM, 710 / PPM, -460 / PPM, program, TextureLoader::get("HealthGreen"), 1);
+	ScoreBoard.Initalise(&camera, 100 / PPM, 600 / PPM, 0, 500 / PPM, program, TextureLoader::get("ScoreBar"));
+	P1HBack.Initalise(&camera, 40 / PPM, 400 / PPM, -780 / PPM, -520 / PPM, program, TextureLoader::get("HealthBack"), 0);
+	P1HRed.Initalise(&camera, 40 / PPM, 400 / PPM, -780 / PPM, -520 / PPM, program, TextureLoader::get("HealthRed"), 0);
+	P1HGreen.Initalise(&camera, 40 / PPM, 400 / PPM, -780 / PPM, -520 / PPM, program, TextureLoader::get("HealthGreen"), 0);
+	P2HBack.Initalise(&camera, 50 / PPM, 400 / PPM, 780 / PPM, -520 / PPM, program, TextureLoader::get("HealthBack"), 1);
+	P2HRed.Initalise(&camera, 50 / PPM, 400 / PPM, 780 / PPM, -520 / PPM, program, TextureLoader::get("HealthRed"), 1);
+	P2HGreen.Initalise(&camera, 50 / PPM, 400 / PPM, 780 / PPM, -520 / PPM, program, TextureLoader::get("HealthGreen"), 1);
 
 	//testPlat.Initalise(&camera, 1, 6, 0, -3, program1, 0,world, b2_staticBody, PLATFORM_CATEGORY, PLAYER_CATEGORY);
 	//testPlat.setColour(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
@@ -72,8 +72,6 @@ void CGameManager::update()
 	{
 		up = GameInput->checkKeyDownFirst(KEY, GLFW_KEY_UP);
 		down = GameInput->checkKeyDownFirst(KEY, GLFW_KEY_DOWN);
-		left = GameInput->checkKeyDownFirst(KEY, GLFW_KEY_LEFT);
-		right = GameInput->checkKeyDownFirst(KEY, GLFW_KEY_RIGHT);
 		confirm = GameInput->checkKeyDownFirst(KEY, GLFW_KEY_ENTER);
 
 		if (P1MovHealth != P1CurHealth)
@@ -236,10 +234,8 @@ void CGameManager::update()
 		player1.update(DT, level1.GetTiles(), player2);
 		player2.update(DT, level1.GetTiles(), player1);
 
-		p1Health.SetText("P1 Health : " + std::to_string((int)player1.getHealth()));
-		P1CurHealth = player1.getHealth();
-		p2Health.SetText("P2 Health : " + std::to_string((int)player2.getHealth()));
-		P2CurHealth = player2.getHealth();
+		P1CurHealth = (player1.getHealth() / 100 - 1.0) * 0.8;
+		P2CurHealth = (player2.getHealth() / 100 - 1.0) * 0.8;
 		p1Dash.SetText("Dash : " + std::to_string(player1.isDashReady()));
 		p2Dash.SetText("Dash : " + std::to_string(player2.isDashReady()));
 
@@ -357,21 +353,19 @@ void CGameManager::render()
 		level1.Render();
 		player1.render();
 		player2.render();
-		p1Health.Render();
-		p2Health.Render();
 		p1Dash.Render();
 		p2Dash.Render();
-		score.Render();
 		/*testPlat.render(glm::mat4());
 		testPlay.render(glm::mat4());*/
 
 		ScoreBoard.render(glm::mat4());
+		score.Render();
 		P1HBack.render(glm::mat4());
 		P1HRed.render(glm::translate(glm::mat4(), glm::vec3(P1MovHealth, 0.0f, 0.0f)));
 		P1HGreen.render(glm::translate(glm::mat4(), glm::vec3(P1CurHealth, 0.0f, 0.0f)));
 		P2HBack.render(glm::mat4());
-		P2HRed.render(glm::translate(glm::mat4(), glm::vec3(P2MovHealth, 0.0f, 0.0f)));
-		P2HGreen.render(glm::translate(glm::mat4(), glm::vec3(P2CurHealth, 0.0f, 0.0f)));
+		P2HRed.render(glm::translate(glm::mat4(), glm::vec3(-P2MovHealth, 0.0f, 0.0f)));
+		P2HGreen.render(glm::translate(glm::mat4(), glm::vec3(-P2CurHealth, 0.0f, 0.0f)));
 	}
 		break;
 	case HelpMenu:
