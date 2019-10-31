@@ -214,8 +214,8 @@ void CGameManager::update()
 		float DT = deltaTime.count() > 0.1f ? 0.1f : deltaTime.count();
 		DT *= spdMultiplier;
 
-		player1.update(DT, level1.GetTiles(), player2);
-		player2.update(DT, level1.GetTiles(), player1);
+		player1.update(DT, player2);
+		player2.update(DT, player1);
 
 		P1CurHealth = (player1.getHealth() / 100 - 1.0) * 8;
 		P2CurHealth = (player2.getHealth() / 100 - 1.0) * 8;
