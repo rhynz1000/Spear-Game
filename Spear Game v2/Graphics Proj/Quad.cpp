@@ -34,3 +34,12 @@ void CQuad::Initalise(CCamera * newCamera, float sizeH, float sizeW, float inita
 {
 	C2DShape::Initalise(newCamera, sizeH, sizeW, initalX, initalY, prog, tex, vertices, indices, sizeof(vertices), sizeof(indices));
 }
+
+void CQuad::Initalise(CCamera * newCamera, float sizeH, float sizeW, float initalX, float initalY, GLuint prog, GLuint tex, int Rot)
+{
+	C2DShape::Initalise(newCamera, sizeH, sizeW, initalX, initalY, prog, tex, vertices, indices, sizeof(vertices), sizeof(indices));
+	if (Rot == 1)
+	{
+		C2DShape::scale(X, -10);
+	}
+}

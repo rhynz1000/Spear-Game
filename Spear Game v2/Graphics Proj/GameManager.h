@@ -54,6 +54,14 @@ private:
 	CQuad P1Cont;
 	CQuad P2Cont;
 
+	CQuad ScoreBoard;
+	CQuad P1HBack;
+	CQuad P1HRed;
+	CQuad P1HGreen;
+	CQuad P2HBack;
+	CQuad P2HRed;
+	CQuad P2HGreen;
+
 	float spdMultiplier = 1;
 
 	int option;
@@ -62,6 +70,11 @@ private:
 	GameState state;
 	bool axisLast = false;
 	bool confirmLast = false;
+
+	float P1CurHealth;
+	float P1MovHealth;
+	float P2CurHealth;
+	float P2MovHealth;
 
 	bool dev = false;
 	bool endgame = false;
