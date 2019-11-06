@@ -20,8 +20,8 @@ void CLevel::LoadFromCSV(std::string filePath, CCamera * camera, GLuint prog, b2
 	
 	background->Initalise(camera, SCR_HEIGHT / PPM, SCR_WIDTH / PPM, 0.0f, 0.0f, prog, TextureLoader::get("background"));
 
-	topTile->Initalise(camera, 60.0f / PPM, 60.0f / PPM, 0.0f, 0.0f, prog, TextureLoader::get("ground"));
-	undergroundTile->Initalise(camera, 60.0f / PPM, 60.0f / PPM, 0.0f, 0.0f, prog, TextureLoader::get("ground_mid"));
+	topTile->Initalise(camera, 60.0f / PPM, 60.0f / PPM, 0.0f, 0.0f, prog, TextureLoader::get("grass-tile"));
+	undergroundTile->Initalise(camera, 60.0f / PPM, 60.0f / PPM, 0.0f, 0.0f, prog, TextureLoader::get("dirt-tile"));
 
 	undergroundTiles.clear();
 	topTiles.clear();
