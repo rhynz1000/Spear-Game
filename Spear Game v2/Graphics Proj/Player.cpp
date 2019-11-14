@@ -27,7 +27,7 @@ void CPlayer::update(float deltaTime, CPlayer &otherPlayer)
 	dash = gameInput->checkKeyDown(KEY, GLFW_KEY_F);
 
 	float horizontalSpeed = (left && !right) || (right && !left) ? (right ? 1.0f : -1.0f) : 0.0f;
-	glm::vec2 spearDir = glm::vec2(0.5f, 0.5f);
+	glm::vec2 spearDir = glm::vec2(0.0f, 1.0f);
 	
 	float halfScrWidth = ((float)SCR_WIDTH) / 2;
 	float halfScrHeight = ((float)SCR_HEIGHT) / 2;
@@ -41,14 +41,16 @@ void CPlayer::update(float deltaTime, CPlayer &otherPlayer)
 		punchLast = gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > -1;
 		shoot = gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > -1 && !shootLast;
 		shootLast = gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > -1;
-		up = gpState.buttons[GLFW_GAMEPAD_BUTTON_A] && !upLast;
-		upLast = gpState.buttons[GLFW_GAMEPAD_BUTTON_A];
+		up = (gpState.buttons[GLFW_GAMEPAD_BUTTON_A] || gpState.buttons[GLFW_GAMEPAD_BUTTON_Y]) && !upLast;
+		upLast = (gpState.buttons[GLFW_GAMEPAD_BUTTON_A] || gpState.buttons[GLFW_GAMEPAD_BUTTON_Y]);
 		horizontalSpeed = gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
 		horizontalSpeed = (abs(horizontalSpeed) > 0.5f) ? horizontalSpeed : 0.0f;
-		spearDir = glm::normalize(glm::vec2(gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_X], -gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]));
+		glm::vec2 rightStick = glm::vec2(gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_X], -gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]);
+		glm::vec2 leftStick = glm::vec2(gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_X], -gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_Y]);
+		spearDir = glm::length(rightStick) > 0.1 ? glm::normalize(rightStick) : glm::length(leftStick) > 0.1 ? glm::normalize(leftStick) : spearDir;
 
-		dash = gpState.buttons[GLFW_GAMEPAD_BUTTON_X] && !dashLast;
-		dashLast = gpState.buttons[GLFW_GAMEPAD_BUTTON_X];
+		dash = (gpState.buttons[GLFW_GAMEPAD_BUTTON_X] || gpState.buttons[GLFW_GAMEPAD_BUTTON_B]) && !dashLast;
+		dashLast = (gpState.buttons[GLFW_GAMEPAD_BUTTON_X] || gpState.buttons[GLFW_GAMEPAD_BUTTON_B]);
 	}
 
 
@@ -94,9 +96,6 @@ void CPlayer::update(float deltaTime, CPlayer &otherPlayer)
 	while (body->GetPosition().y > 0.5f * static_cast<float>(B2_HEIGHT)) {
 		body->SetTransform(b2Vec2(body->GetPosition().x, body->GetPosition().y - B2_HEIGHT), 0);
 	}
-
-	
-
 	
 	if (shoot && spear == 0)
 	{
@@ -118,7 +117,7 @@ void CPlayer::update(float deltaTime, CPlayer &otherPlayer)
 			vecToOther = otherPlayer.getSpear()->body->GetPosition() - body->GetPosition();
 			vecToOther2 = glm::vec2{ vecToOther.x, vecToOther.y };
 
-			if (punch && vecToOther.LengthSquared() < meleeRange*meleeRange && std::acos(glm::dot(glm::normalize(vecToOther2), glm::normalize(spearDir)))  < 3.1415926535f * 0.33333333f)
+			if (punch && vecToOther.LengthSquared() < meleeRange*meleeRange /*&& std::acos(glm::dot(glm::normalize(vecToOther2), glm::normalize(spearDir)))  < 3.1415926535f * 0.33333333f*/)
 			{
 				spear = otherPlayer.swapSpear(spear);
 				spear->destroyBody();
@@ -134,7 +133,7 @@ void CPlayer::update(float deltaTime, CPlayer &otherPlayer)
 
 			//std::cout << vecToOther.LengthSquared() << ", " << std::acos(glm::dot(glm::normalize(vecToOther2), glm::normalize(spearDir))) << std::endl;
 
-			if (punch && vecToOther.LengthSquared() < meleeRange*meleeRange && std::acos(glm::dot(glm::normalize(vecToOther2), glm::normalize(spearDir))) < 3.1415926535f * 0.33333333f)
+			if (punch && vecToOther.LengthSquared() < meleeRange*meleeRange /*&& std::acos(glm::dot(glm::normalize(vecToOther2), glm::normalize(spearDir))) < 3.1415926535f * 0.33333333f*/)
 			{
 				spear->destroyBody();
 				delete spear;
@@ -172,7 +171,7 @@ void CPlayer::reset()
 	grounded = false;
 	upLast = true;
 
-	body->SetTransform(b2Vec2(spawnPoint.x / PPM, spawnPoint.y / PPM), 0);
+	body->SetTransform(b2Vec2(spawnPoint.x, spawnPoint.y), 0);
 
 	if (spear)
 	{

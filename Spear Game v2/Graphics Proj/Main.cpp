@@ -44,6 +44,8 @@ int main(int argc, char **argv)
 	
 	glfwMakeContextCurrent(window);
 
+	glfwMaximizeWindow(window);
+
 	glfwSwapInterval(1);
 
 	glCullFace(GL_BACK);

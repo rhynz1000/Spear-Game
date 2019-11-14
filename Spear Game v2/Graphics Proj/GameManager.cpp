@@ -37,9 +37,9 @@ void CGameManager::initalise(CInput* input)
 	P2Cont.Initalise(&camera, 300 / PPM, 500 / PPM, 400 / PPM, -20 / PPM, program, TextureLoader::get("Controller"));
 	P1Cont.Initalise(&camera, 300 / PPM, 500 / PPM, -400 / PPM, -20 / PPM, program, TextureLoader::get("Controller"));
 
-	player1.initalise(GameInput, &camera, 100/PPM, 50 / PPM, 0, 300 / PPM, program, TextureLoader::get("player1"), 0, TextureLoader::get("spear"), world);
+	player1.initalise(GameInput, &camera, 100/PPM, 50 / PPM, 800 / PPM, 0, program, TextureLoader::get("player1"), 0, TextureLoader::get("spear"), world);
 	player1.setId(1);
-	player2.initalise(GameInput, &camera, 100 / PPM, 50 / PPM, 0, 0, program, TextureLoader::get("player2"), 1, TextureLoader::get("spear"), world);
+	player2.initalise(GameInput, &camera, 100 / PPM, 50 / PPM, -800 / PPM, 0, program, TextureLoader::get("player2"), 1, TextureLoader::get("spear"), world);
 	player2.setId(2);
 
 	victory.init("", "Resources/Fonts/arial.ttf", glm::vec2(), glm::vec3(), 1);
@@ -254,14 +254,16 @@ void CGameManager::update()
 			if (player1.getScore() >= 2)
 			{
 				victory.SetText("Player 1 wins");
-				victory.SetPosition(glm::vec2(-160/PPM, 0));
+				victory.SetPosition(glm::vec2(-160, 0));
+				confirmLast = true;
 				endgame = true;
 				state = EndScreen;
 			}
 			else if (player2.getScore() >= 2)
 			{
 				victory.SetText("Player 2 wins");
-				victory.SetPosition(glm::vec2(-160/PPM, 0));
+				victory.SetPosition(glm::vec2(-160, 0));
+				confirmLast = true;
 				endgame = true;
 				state = EndScreen;
 			}
@@ -433,14 +435,14 @@ void CGameManager::PreSolve(b2Contact * contact, const b2Manifold * oldManifold)
 
 void CGameManager::PostSolve(b2Contact * contact, const b2ContactImpulse * impulse)
 {
-	if ((int)contact->GetFixtureA()->GetBody()->GetUserData() == 3 && (int)contact->GetFixtureB()->GetBody()->GetUserData() == 4)
+	if ((int)contact->GetFixtureA()->GetBody()->GetUserData() == 3 && ((int)contact->GetFixtureB()->GetBody()->GetUserData() == 4 || (int)contact->GetFixtureB()->GetBody()->GetUserData() == 6))
 	{
 		StickyInfo si;
 		si.targetBody = contact->GetFixtureA()->GetBody();
 		si.spearBody = contact->GetFixtureB()->GetBody();
 		spearsStuck.push_back(si);
 	}
-	else if ((int)contact->GetFixtureA()->GetBody()->GetUserData() == 3 && (int)contact->GetFixtureB()->GetBody()->GetUserData() == 5)
+	else if ((int)contact->GetFixtureA()->GetBody()->GetUserData() == 3 && ((int)contact->GetFixtureB()->GetBody()->GetUserData() == 5 || (int)contact->GetFixtureB()->GetBody()->GetUserData() == 6))
 	{
 		StickyInfo si;
 		si.targetBody = contact->GetFixtureA()->GetBody();
@@ -449,10 +451,12 @@ void CGameManager::PostSolve(b2Contact * contact, const b2ContactImpulse * impul
 	}
 	else if ((int)contact->GetFixtureA()->GetBody()->GetUserData() == 1 && (int)contact->GetFixtureB()->GetBody()->GetUserData() == 5)
 	{
-		player1.hit(100);
+		contact->GetFixtureB()->GetBody()->SetUserData((void*)6);
+		player1.hit(50);
 	}
 	else if ((int)contact->GetFixtureA()->GetBody()->GetUserData() == 2 && (int)contact->GetFixtureB()->GetBody()->GetUserData() == 4)
 	{
-		player2.hit(100);
+		contact->GetFixtureB()->GetBody()->SetUserData((void*)6);
+		player2.hit(50);
 	}
 }
