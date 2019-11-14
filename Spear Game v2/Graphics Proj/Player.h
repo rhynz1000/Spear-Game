@@ -45,6 +45,8 @@ private:
 	float health = 100;
 	const float maxHealth = 100;
 	glm::vec2 spawnPoint;
+	glm::vec2 spearDir{ 0.5f, 0.5f };
+	CQuad * reticle;
 	int score = 0;
 	float jumpForce = 10.0f;
 	const float meleeRange = 2.0f;

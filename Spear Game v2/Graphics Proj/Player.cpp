@@ -13,7 +13,11 @@ void CPlayer::initalise(CInput * input, CCamera* newCamera, float sizeH, float s
 	joystick = joy;
 
 	spawnPoint = glm::vec2(initalX, initalY);
-}
+
+	reticle = new CQuad();
+	reticle->Initalise(newCamera, 0.7f, 0.7f, initalX + spearDir.x, initalY + spearDir.y, prog, TextureLoader::get("crosshair"));
+
+}	
 
 void CPlayer::update(float deltaTime, CPlayer &otherPlayer)
 {
@@ -27,7 +31,7 @@ void CPlayer::update(float deltaTime, CPlayer &otherPlayer)
 	dash = gameInput->checkKeyDown(KEY, GLFW_KEY_F);
 
 	float horizontalSpeed = (left && !right) || (right && !left) ? (right ? 1.0f : -1.0f) : 0.0f;
-	glm::vec2 spearDir = glm::vec2(0.0f, 1.0f);
+	spearDir = glm::vec2(0.5f, 0.5f);
 	
 	float halfScrWidth = ((float)SCR_WIDTH) / 2;
 	float halfScrHeight = ((float)SCR_HEIGHT) / 2;
@@ -153,6 +157,9 @@ void CPlayer::update(float deltaTime, CPlayer &otherPlayer)
 		}
 	}
 
+	reticle->translate(X, body->GetPosition().x + spearDir.x, false);
+	reticle->translate(Y, body->GetPosition().y + spearDir.y, false);
+
 	this->physicsUpdate();
 }
 
@@ -163,6 +170,7 @@ void CPlayer::render()
 	{
 		spear->render(glm::mat4());
 	}
+	reticle->render(glm::mat4());
 }
 
 void CPlayer::reset()
