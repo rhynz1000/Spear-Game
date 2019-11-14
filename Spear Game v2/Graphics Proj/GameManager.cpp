@@ -205,6 +205,8 @@ void CGameManager::update()
 
 		if (state == MainMenu)
 		{
+			if (P1Connected == 1 || P2Connected == 1) { P1Connected = 0; P2Connected = 0; }
+
 			if (up)
 			{
 				CAudio::getInstance()->playSound("MouseOver", 0.3f);
