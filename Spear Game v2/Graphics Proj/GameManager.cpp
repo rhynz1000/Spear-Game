@@ -66,13 +66,14 @@ void CGameManager::initalise(CInput* input)
 void CGameManager::update()
 {
 	
-	bool up, down, left, right, confirm;
+	bool up, down, left, right, confirm, back;
 
 	if (state != Game)
 	{
 		up = GameInput->checkKeyDownFirst(KEY, GLFW_KEY_UP);
 		down = GameInput->checkKeyDownFirst(KEY, GLFW_KEY_DOWN);
 		confirm = GameInput->checkKeyDownFirst(KEY, GLFW_KEY_ENTER);
+		back = GameInput->checkKeyDownFirst(KEY, GLFW_KEY_BACKSPACE);
 
 		if (GameInput->isJoystickValid(0))
 		{
@@ -84,6 +85,7 @@ void CGameManager::update()
 
 			confirm = gpState.buttons[GLFW_GAMEPAD_BUTTON_A] && !confirmLast;
 			confirmLast = gpState.buttons[GLFW_GAMEPAD_BUTTON_A];
+			back = gpState.buttons[GLFW_GAMEPAD_BUTTON_B];
 		}
 
 		if (confirm)
@@ -157,9 +159,50 @@ void CGameManager::update()
 			default:
 				break;
 			}
-
-
 		}
+		else if(back)
+		{
+			switch (state)
+			{
+			case MainMenu:
+			{
+				
+			}
+			break;
+
+			case HelpMenu:
+			{
+				state = MainMenu;
+			}
+			break;
+
+			case EndScreen:
+			{
+				if (endgame)
+				{
+					player1.resetScore();
+					player2.resetScore();
+					score.SetText("0 : 0");
+					state = MainMenu;
+				}
+				else
+				{
+					loadLevel(level1);
+					state = Game;
+				}
+			}
+			break;
+
+			case Lobby:
+			{
+				state = MainMenu;
+			}
+
+			default:
+				break;
+			}
+		}
+
 		if (state == MainMenu)
 		{
 			if (up)

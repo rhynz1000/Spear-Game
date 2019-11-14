@@ -33,7 +33,7 @@ private:
 	CCamera* camera;
 	GLuint spearProg, spearTex;
 	const float speed = 400.0f;
-	const float spearSpd = 10.0f;
+	const float spearSpd = 7.0f;
 	bool grounded = false;
 	bool canDoubleJump = true;
 	int joystick = 0;

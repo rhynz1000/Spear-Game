@@ -11,6 +11,6 @@ public:
 	void physicsUpdate()override;
 
 private:
-	float dragConstant = 0.1f;
+	float dragConstant = 0.05f;
 };
 

@@ -51,7 +51,7 @@ void CPlayer::update(float deltaTime, CPlayer &otherPlayer)
 		horizontalSpeed = (abs(horizontalSpeed) > 0.5f) ? horizontalSpeed : 0.0f;
 		glm::vec2 rightStick = glm::vec2(gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_X], -gpState.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]);
 		glm::vec2 leftStick = glm::vec2(gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_X], -gpState.axes[GLFW_GAMEPAD_AXIS_LEFT_Y]);
-		spearDir = glm::length(rightStick) > 0.1 ? glm::normalize(rightStick) : glm::length(leftStick) > 0.1 ? glm::normalize(leftStick) : spearDir;
+		spearDir = glm::length(rightStick) > 0.3 ? glm::normalize(rightStick) : glm::length(leftStick) > 0.3 ? glm::normalize(leftStick) : spearDir;
 
 		dash = (gpState.buttons[GLFW_GAMEPAD_BUTTON_X] || gpState.buttons[GLFW_GAMEPAD_BUTTON_B]) && !dashLast;
 		dashLast = (gpState.buttons[GLFW_GAMEPAD_BUTTON_X] || gpState.buttons[GLFW_GAMEPAD_BUTTON_B]);
